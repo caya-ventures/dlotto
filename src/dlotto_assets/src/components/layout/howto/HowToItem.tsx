@@ -2,6 +2,7 @@ import React from 'react';
 import styled from "styled-components";
 import { HowToItem } from "./HowToItems";
 import { baseTheme } from "../../../styles/theme";
+import { respondTo } from '../../../styles/helpers';
 
 const HowToItemStyled = styled.li<{bgImg: string}>`
   padding: 8rem 0 1rem 0;
@@ -13,7 +14,11 @@ const HowToItemStyled = styled.li<{bgImg: string}>`
   text-align: center;
   transition: all .5s;;
   box-shadow: 0 0 60px rgba(255, 219, 75, 0.1);
+
+  ${respondTo('md')` background-position: 50% 20%; `}
   
+  ${respondTo('xs')` background-position: 50% 20%; width: 100%; margin-bottom: 1rem; background-size: 50% auto; `}
+
   &:hover {
     background-position: 40% 0;
     background-size: 90% auto;

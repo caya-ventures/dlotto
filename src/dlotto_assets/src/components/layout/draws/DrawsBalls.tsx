@@ -5,20 +5,41 @@ import Loader from "../Loader";
 import { baseTheme } from "../../../styles/theme";
 import { matchUserTickets, pluralPipe } from "../../../utils";
 import { AppContext } from "../../../context";
+import { respondAfter, respondTo } from '../../../styles/helpers';
+
+const ballSize = '4.5rem';
+const ballSizeFrom = '2.5rem';
+const mobileBallSize = '2.5rem';
+const mobileBallSizeFrom = '1.5rem';
 
 const DrawsBallsStyled = styled.div`
   padding: 1rem 0 1rem 1rem;
 
+  ${respondTo('sm')` padding: 1rem 0; width: 100%; `}
+
   @keyframes ballAppear {
     from {
       opacity: .5;
-      width: 2.5rem;
-      height: 2.5rem;
+      width: ${ballSizeFrom};
+      height: ${ballSizeFrom};
     }
     to {
       opacity: 1;
-      width: 4.5rem;
-      height: 4.5rem;
+      width: ${ballSize};
+      height: ${ballSize};
+    }
+  };
+  
+  @keyframes mobileBallAppear {
+    from {
+      opacity: .5;
+      width: ${mobileBallSizeFrom};
+      height: ${mobileBallSizeFrom};
+    }
+    to {
+      opacity: 1;
+      width: ${mobileBallSize};
+      height: ${mobileBallSize};
     }
   }
 `;
@@ -45,8 +66,10 @@ const BallsUl = styled.ul`
   list-style: none;
   padding: .25rem;
   margin: 0 auto;
-  width: 27rem;
-  height: 5rem;
+  width: 100%;
+  max-width: 27rem;
+  
+  ${respondAfter('sm')` width: 27rem; height: 5rem; padding: 0; `}
 `;
 
 const BallsLi = styled.li`
@@ -60,6 +83,8 @@ const BallsLi = styled.li`
   align-items: center;
   animation: ballAppear .5s;
   transition: all .5s;
+
+  ${respondTo('xs')` width: 2.5rem; height: 2.5rem; animation: mobileBallAppear .5s; `}
 
   &:hover {
     transform: rotate(10deg);
@@ -77,6 +102,8 @@ const BallsLi = styled.li`
     text-align: center;
     font-weight: 700;
     color: #2F2F2F;
+
+    ${respondTo('xs')` width: 1.5rem; height: 1.5rem; line-height: 1.5rem; font-size: 1rem; `}
   }
 
   &.super {

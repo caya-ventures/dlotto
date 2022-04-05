@@ -19,6 +19,8 @@ const Jackpot = styled.div`
   text-align: center;
   padding: 1rem;
   margin: 0 auto;
+  position: relative;
+  z-index: 101;
 `;
 
 const JackpotTitle = styled.h1`
@@ -68,8 +70,9 @@ const JackpotTicketPrice = styled.span`
 `;
 
 const JackpotModal = styled.div`
-  width: 23.5rem;
-  
+  max-width: 23.5rem;
+  width: 100%;
+
   .action-btn {
     margin-top: 1rem;
     width: 100%;
@@ -82,7 +85,7 @@ const CurrentTickets = styled.span`
   display: block;
   height: 1.5rem;
   line-height: 1;
-  color: ${ baseTheme.colors.bgPrimary };
+  color: ${baseTheme.colors.bgPrimary};
   font-weight: bold;
   text-align: center;
   opacity: 0;
@@ -123,7 +126,7 @@ const BannerJackPot = () => {
     const onViewTickets = () => {
         if (!currentRound) return;
         setCurrentTicketsModal(true);
-    }
+    };
 
     return (
         <Jackpot>
@@ -145,7 +148,8 @@ const BannerJackPot = () => {
             </JackpotAction>
             {
                 isAuthenticated ?
-                    <CurrentTickets onClick={onViewTickets} className={`${currentRound ? 'show' : ''}`}>View my tickets</CurrentTickets>
+                    <CurrentTickets onClick={onViewTickets} className={`${currentRound ? 'show' : ''}`}>View my
+                        tickets</CurrentTickets>
                     : <></>
             }
             <Modal title={'Your tickets in current round'}
@@ -154,7 +158,7 @@ const BannerJackPot = () => {
                     {
                         isLoadingTicket ? <Loader/> :
                             <>
-                                <TicketGrid userTickets={userTickets || []} />
+                                <TicketGrid userTickets={userTickets || []}/>
                                 <Link to={'/buy'} className="btn btn-primary action-btn"
                                       onClick={() => setCurrentTicketsModal(false)}>
                                     Buy tickets
@@ -166,6 +170,6 @@ const BannerJackPot = () => {
 
         </Jackpot>
     );
-}
+};
 
 export default BannerJackPot;

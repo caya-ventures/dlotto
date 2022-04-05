@@ -3,10 +3,13 @@ import styled from "styled-components";
 import { baseTheme } from "../../../styles/theme";
 import { Ticket } from '../../../../../declarations/dlotto/dlotto.did';
 import { DRAWS_CONFIG } from './DrawsConfig';
+import { respondTo } from '../../../styles/helpers';
 
 const MatchesStyled = styled.div`
   background: ${baseTheme.colors.bgSecondary};
   padding: 1.25rem 2.5rem;
+
+  ${respondTo('md')` padding: 1rem; `}
 `;
 
 const MatchesTitle = styled.p`
@@ -18,6 +21,8 @@ const MatchesList = styled.div`
   grid-template-columns: 1fr 1fr 1fr;
   column-gap: 1rem;
   row-gap: 1rem;
+
+  ${respondTo('md')` grid-template-columns: 1fr 1fr; `}
 `;
 
 const MatchesListItem = styled.div`

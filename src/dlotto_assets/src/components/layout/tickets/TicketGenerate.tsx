@@ -29,6 +29,7 @@ const TextPrice = styled.span`
 
 const GenerateButton = styled.button`
   height: 2rem;
+  width: 6rem;
   line-height: 2rem;
   background: ${ baseTheme.colors.textColor };
   border-top-right-radius: .25rem;

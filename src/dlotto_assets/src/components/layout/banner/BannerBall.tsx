@@ -9,6 +9,7 @@ interface BallProps {
     left?: number | string;
     bottom?: number | string;
     right?: number | string;
+    isHidden?: boolean;
 }
 
 const Ball = styled.span<BallProps>`
@@ -19,15 +20,19 @@ const Ball = styled.span<BallProps>`
   bottom: ${({ bottom }) => bottom !== 'undefined' ? bottom + '%' : 'auto'};
   left: ${({ left }) => left !== 'undefined' ? left + '%' : 'auto'};
   right: ${({ right }) => right !== 'undefined' ? right + '%' : 'auto'};
-  background: url('${ ({bgImg}) => bgImg }') 0 0 no-repeat;
+  background: url('${({ bgImg }) => bgImg}') 0 0 no-repeat;
   background-size: contain;
   z-index: 3;
 `;
 
 const BannerBall = (props: BallProps) => {
+    const { isHidden } = props;
+
+    if (isHidden) return null;
+
     return (
         <Ball {...props} />
     );
-}
+};
 
 export default BannerBall;

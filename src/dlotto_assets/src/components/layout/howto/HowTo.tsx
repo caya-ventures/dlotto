@@ -3,6 +3,7 @@ import HowToItem from "./HowToItem";
 import styled from "styled-components";
 import { howToItems } from "./HowToItems";
 import { mainBlockTitle, mainContentWrapper } from "../../../styles/utils";
+import { respondTo } from '../../../styles/helpers';
 
 const HowToStyled = styled.div`
   padding: 2rem 1rem;
@@ -21,6 +22,8 @@ const Ul = styled.ul`
   display: flex;
   justify-content: space-between;
   ${ mainContentWrapper };
+
+  ${respondTo('xs')` flex-direction: column; padding: 0; `}
 `;
 
 const HowTo = () => {

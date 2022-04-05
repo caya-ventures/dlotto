@@ -3,7 +3,7 @@ import { Header, Footer } from './components/layout';
 import { Home, BuyPage } from './components/pages';
 import { useAuthClient, useProfile, profilesMatch, emptyProfile, useModalClient } from './hooks';
 import { createBrowserHistory } from 'history';
-import toast from 'react-hot-toast';
+import toast, { Toaster } from 'react-hot-toast';
 import { remove } from 'local-storage';
 import { BrowserRouter as Router, Route } from 'react-router-dom';
 import { AppContext, ModalContext } from './context';
@@ -91,6 +91,7 @@ const App = () => {
             </MainLayout>
             <Footer/>
             <GlobalStyles/>
+            <Toaster />
             <Modal title={'Account'} isVisible={modalClient?.authModal}>
                 <AuthModal/>
             </Modal>

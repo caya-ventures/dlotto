@@ -10,7 +10,8 @@ const ModalContent = styled.div`
   border-radius: .25rem;
   padding: 1.25rem;
   margin: 1rem 0 0 0;
-  width: 22.5rem;
+  max-width: 22.5rem;
+  width: 100%;
 `;
 
 const Connection = styled.div`
