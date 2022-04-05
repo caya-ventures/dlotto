@@ -1,0 +1,35 @@
+type Tokens = record {e8s: nat64;};
+type Result_1 = 
+ variant {
+   err: Error;
+   ok: Profile;
+ };
+type Result = 
+ variant {
+   err: Error;
+   ok;
+ };
+type ProfileUpdate = record {bio: Bio;};
+type Profile = 
+ record {
+   bio: Bio;
+   id: principal;
+ };
+type Error = 
+ variant {
+   AlreadyExists;
+   NotAuthorized;
+   NotFound;
+ };
+type Bio = record {username: text;};
+type AccountIdentifier = blob;
+service : {
+  canisterAccount: () -> (AccountIdentifier) query;
+  canisterBalance: () -> (Tokens);
+  create: () -> (Result);
+  delete: () -> (Result);
+  read: () -> (Result_1) query;
+  tranferTokens: () -> ();
+  update: (ProfileUpdate) -> (Result);
+  userBalance: () -> (Tokens);
+}

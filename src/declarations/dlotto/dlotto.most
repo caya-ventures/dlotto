@@ -1,0 +1,41 @@
+type Branch<K, V> = {left : Trie<K, V>; right : Trie<K, V>; size : Nat};
+type Leaf<K, V> = {keyvals : AssocList/1<Key<K>, V>; size : Nat};
+type Profile/1 = Profile;
+type Ticket =
+  {
+    date_time : Int;
+    entity_id : Nat;
+    regular : Numbers;
+    round : Round;
+    super : Numbers
+  };
+type UserTicket = {ticket : Ticket; ticket_id : TicketId; user_id : UserId};
+actor {
+  stable var lastTicketCl : Nat;
+  stable var prizePot : Nat;
+  stable var profiles :
+    {
+      #branch : Branch<Principal, Profile/1>;
+      #empty;
+      #leaf : Leaf<Principal, Profile/1>
+    };
+  stable var round : Nat;
+  stable var startClFrom : Nat;
+  stable var startTime : Int;
+  stable var ticketPrizeStorage :
+    {#branch : Branch<Nat, Float>; #empty; #leaf : Leaf<Nat, Float>};
+  stable var ticketStorage :
+    {
+      #branch : Branch<Nat, UserTicket>;
+      #empty;
+      #leaf : Leaf<Nat, UserTicket>
+    };
+  stable var userTicketStorage :
+    {
+      #branch : Branch<Text, [UserTicket]>;
+      #empty;
+      #leaf : Leaf<Text, [UserTicket]>
+    };
+  stable var winHistoryStorage :
+    {#branch : Branch<Nat, Ticket>; #empty; #leaf : Leaf<Nat, Ticket>}
+};
