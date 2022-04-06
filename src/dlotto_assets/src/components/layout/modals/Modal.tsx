@@ -26,6 +26,8 @@ const ModalContainer = styled.div`
   animation-duration: .3s;
   animation-name: slidein;
   animation-timing-function: ease-in-out;
+  max-height: 100%;
+  overflow: auto;
 `;
 
 const ModalContainerHeader = styled.div`

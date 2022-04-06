@@ -70,12 +70,14 @@ export const matchUserTickets = (userTickets: UserTicket[], ticket: Ticket) => {
     }
 
     userTickets?.forEach(userTicket => {
-        if (userTicket?.ticket?.super[0] === ticket?.super[0]) {
+        const regularMatches = ticket.regular.filter(x => userTicket?.ticket?.regular.includes(x)).length;
+        const superMatch = userTicket?.ticket?.super[0] === ticket?.super[0];
+
+        if (superMatch) {
             ballMatchCount++;
             ticketIds.push(userTicket?.ticket_id);
         }
-        const regularMatches = ticket.regular.filter(x => userTicket?.ticket?.regular.includes(x)).length;
-        if (regularMatches > 1) {
+        if (regularMatches == 2 && superMatch || regularMatches > 2) {
             ballMatchCount += regularMatches;
             if (!ticketIds.includes(userTicket?.ticket?.entity_id)) {
                 ticketIds.push(userTicket?.ticket_id);

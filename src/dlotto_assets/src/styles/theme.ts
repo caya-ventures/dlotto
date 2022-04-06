@@ -74,6 +74,11 @@ export const baseTheme = {
             padding: '1rem',
             lineHeight: 1.5,
         },
-    }
-
+    },
+    breakpoints: {
+        xs: 480,
+        sm: 768,
+        md: 992,
+        lg: 1200,
+    },
 }

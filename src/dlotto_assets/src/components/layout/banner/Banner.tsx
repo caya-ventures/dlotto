@@ -20,17 +20,17 @@ const pageBannerSize = css`
   flex: 1;
 `;
 
-const MainBanner = styled.div<{ mode: BannerDisplayMode}>`
+const MainBanner = styled.div<{ mode: BannerDisplayMode }>`
   position: relative;
   background: url('../../../../assets/banner/main_bg.jpeg') 0 0 no-repeat;
-  ${({ mode }) => mode === BannerDisplayMode.BANNER ? mainBannerSize : pageBannerSize}
+  ${({ mode }) => mode === BannerDisplayMode.BANNER ? mainBannerSize : pageBannerSize};
 `;
 
-const MainBannerRibbons = styled.div<{ mode: BannerDisplayMode}>`
+const MainBannerRibbons = styled.div<{ mode: BannerDisplayMode }>`
   background: url('../../../../assets/banner/secondary_bg.png') 0 50% no-repeat;
   position: relative;
   z-index: 3;
-  ${({ mode }) => mode === BannerDisplayMode.BANNER ? mainBannerSize : pageBannerSize}
+  ${({ mode }) => mode === BannerDisplayMode.BANNER ? mainBannerSize : pageBannerSize};
   align-items: center;
   justify-content: center;
 `;
@@ -57,7 +57,9 @@ const MainBannerTicket2 = styled.span`
   z-index: 1;
 `;
 
-const Banner = ({ mode, children }: {mode: BannerDisplayMode; children?: JSX.Element}) => {
+const Banner = ({ mode, children }: { mode: BannerDisplayMode; children?: JSX.Element }) => {
+
+    const isHidden = window.outerWidth <= baseTheme.breakpoints.sm;
 
     return (
         <MainBanner mode={mode}>
@@ -67,10 +69,12 @@ const Banner = ({ mode, children }: {mode: BannerDisplayMode; children?: JSX.Ele
                 <BannerBall height={3} width={3} bgImg={'../../../../assets/banner/ball1.png'} top={30} left={20}/>
                 <BannerBall height={4.25} width={4.25} bgImg={'../../../../assets/banner/ball2.png'} top={80}
                             left={25}/>
-                <BannerBall height={5} width={5} bgImg={'../../../../assets/banner/ball3.png'} top={5} left={30}/>
+                <BannerBall height={5} width={5} bgImg={'../../../../assets/banner/ball3.png'} top={5} left={30}
+                            isHidden={isHidden}/>
                 <BannerBall height={4.75} width={4.75} bgImg={'../../../../assets/banner/ball4.png'} top={70}
-                            left={35}/>
-                <BannerBall height={2.25} width={2.25} bgImg={'../../../../assets/banner/ball5.png'} top={7} left={58}/>
+                            left={35} isHidden={isHidden}/>
+                <BannerBall height={2.25} width={2.25} bgImg={'../../../../assets/banner/ball5.png'} top={7} left={58}
+                            isHidden={isHidden}/>
                 <BannerBall height={2.55} width={5.25} bgImg={'../../../../assets/banner/ball6.png'} bottom={0}
                             left={61}/>
                 <BannerBall height={3.75} width={3.75} bgImg={'../../../../assets/banner/ball7.png'} top={40}

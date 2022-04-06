@@ -3,6 +3,7 @@ import styled, { css } from 'styled-components';
 import { baseTheme } from '../../../styles/theme';
 import { TicketBall } from './index';
 import { Ticket } from '../../../../../declarations/dlotto/dlotto.did';
+import { respondTo } from '../../../styles/helpers';
 
 const colStyle = css`
   border-radius: .25rem;
@@ -21,6 +22,8 @@ const Grid = styled.div`
   .bottom-gap {
     margin-bottom: .5rem;
   }
+
+  ${respondTo('sm')` display: block; `}
 `;
 
 const GridColMain = styled.div`
@@ -28,6 +31,8 @@ const GridColMain = styled.div`
   ${colStyle};
   background: rgba(68, 68, 68, 0.5);
   width: 12rem;
+
+  ${respondTo('sm')` width: 17rem; `}
 `;
 
 const GridColSuper = styled.div`
@@ -35,12 +40,16 @@ const GridColSuper = styled.div`
   ${colStyle};
   background: rgba(68, 68, 68, 0.5);
   width: 14.5rem;
+  
+  ${respondTo('sm')` width: 17rem; margin: 1rem 0; `}
 `;
 
 const GridColSelect = styled.div`
   grid-area: select;
   background: ${baseTheme.colors.textGrey};
   ${colStyle};
+
+  ${respondTo('sm')` width: 17rem; `}
 `;
 
 const GridColTitle = styled.p`

@@ -10,7 +10,8 @@ const ModalContent = styled.div`
   border-radius: .25rem;
   padding: 1.25rem;
   margin: 1rem 0 0 0;
-  width: 22.5rem;
+  max-width: 22.5rem;
+  width: 100%;
 `;
 
 const Connection = styled.div`
@@ -63,7 +64,7 @@ const AuthModal = () => {
             <Session>
                 <ICimg src="assets/ic-badge.svg" alt="Internet Computer"/>
                 <span>{username}</span>
-                <div>Balance: {balance} ICP</div>
+                <div>Balance: {balance || 0} ICP</div>
                 <div className="session-actions">
                     <CopyToClipboard text={username}>
                         <button className={"btn btn-transparent btn--small btn-with-ico"}>

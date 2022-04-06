@@ -1,15 +1,17 @@
-import React, { SetStateAction, useCallback, useContext, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import styled from "styled-components";
 import { baseTheme } from '../../../styles/theme';
 import { TicketGenerate } from './';
 import { Ticket, UserTicket } from '../../../../../declarations/dlotto/dlotto.did';
 import TicketGrid from './TicketGrid';
-import { randomNumbersArray, toTickets, toUserTickets } from '../../../utils';
+import { pluralPipe, randomNumbersArray, toTickets, toUserTickets } from '../../../utils';
 import { useDlottoClient } from '../../../hooks';
 import { ModalContext } from '../../../context';
 import { Modal } from '../modals';
 import TicketEdit from './TicketEdit';
 import { useHistory } from 'react-router-dom';
+import { SvgCross } from '../../svg';
+import toast from 'react-hot-toast';
 
 const BuyWrapper = styled.div`
   max-width: 32rem;
@@ -25,6 +27,12 @@ const BuyWrapper = styled.div`
     display: block;
     text-align: center;
   }
+`;
+
+const BuyHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  vertical-align: center;
 `;
 
 const BuyTitle = styled.div`
@@ -49,16 +57,22 @@ const TicketBuy = () => {
     const [ isApproving, setIsApproving ] = useState(false as boolean);
 
 
+    const goBack = () => {
+        history.push('/');
+    };
+
     const approveTickets = () => {
         if (isApproving) return;
         setIsApproving(true);
         actorDlotto?.assignTicketToUser(tickets as Ticket[])
-            .then(() => {
-                // TODO: update balance, update tickets
+            .then((v) => {
+                // TODO: handle error
+                toast.success(`You have bought ${tickets?.length} ${pluralPipe(tickets?.length, 'ticket')}`);
+                // TODO: update balance
             })
             .finally(() => {
                 setIsApproving(false);
-                history.push('/');
+                goBack();
             });
     };
 
@@ -86,7 +100,12 @@ const TicketBuy = () => {
 
     return (
         <BuyWrapper>
-            <BuyTitle>Buy tickets</BuyTitle>
+            <BuyHeader>
+                <BuyTitle>Buy tickets</BuyTitle>
+                <button className={"btn btn-transparent btn-ico"} onClick={goBack}>
+                    <SvgCross width={12} height={12} color={baseTheme.colors.textAction}/>
+                </button>
+            </BuyHeader>
             <p>Numbers are randomized, with no duplicates among your tickets. You are able to edit numbers before the
                 Purchase.</p>
             <TicketGenerate action={generateTickets}/>

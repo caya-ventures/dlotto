@@ -18,6 +18,7 @@ import { Modal } from "../modals";
 import { TicketGrid } from "../tickets";
 import { CSSTransition } from 'react-transition-group';
 import { Link } from 'react-router-dom';
+import { respondTo } from '../../../styles/helpers';
 
 const DrawsStyled = styled.div`
   padding: 2rem 1rem;
@@ -42,16 +43,23 @@ const DrawsHeader = styled.div`
   padding: .5rem 2.5rem;
   justify-content: space-between;
   min-height: 3rem;
+  flex-direction: row;
+
+  ${respondTo('md')` flex-direction: column;  padding: .5rem 1rem; `}
 `;
 
 const DrawsDate = styled.div`
   line-height: 1.8;
+
+  ${respondTo('md')` margin-top: .5rem; `}
 `;
 
 const DrawsContentWrapper = styled.div`
   height: 200px;
   background: url('../../../../assets/svg/block_bg.svg') right top no-repeat;
   background-size: 100% auto;
+  
+  ${respondTo('md')` height: auto; background-size: auto 100%; `}
 `;
 
 const DrawsContent = styled.div`
@@ -62,6 +70,9 @@ const DrawsContent = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-direction: row;
+
+  ${respondTo('md')` flex-direction: column; height: auto; background-size: auto 100%; padding: 0 1rem; `}
 `;
 
 const DrawsFooter = styled.div`
@@ -79,7 +90,8 @@ const DrawsFooter = styled.div`
 `;
 
 const DrawsModal = styled.div`
-  width: 23.5rem;
+  max-width: 23.5rem;
+  width: 100%;
 
   .action-btn {
     margin-top: 1rem;
