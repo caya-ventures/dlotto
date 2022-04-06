@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import styled from 'styled-components';
 import { baseTheme } from '../../../styles/theme';
 import { SvgArrowDown, SvgArrowTop } from '../../svg';
 import { TICKET_PRICE } from '../../../config';
 import { roundPrice } from '../../../utils';
+import { AppContext } from '../../../context';
 
 const Wrapper = styled.div`
   background: ${baseTheme.colors.textGrey};
@@ -83,6 +84,7 @@ const TicketGenerate = ({ action }: { action: (a: number) => void }) => {
     const MAX_COUNT = 10;
     const MIN_COUNT = 1;
     const [ count, setCount ] = useState(1);
+    const { balance } = useContext(AppContext);
 
     const setCountAction = (value: number, event: React.MouseEvent<Element, MouseEvent>): void => {
         event.preventDefault();
@@ -94,7 +96,7 @@ const TicketGenerate = ({ action }: { action: (a: number) => void }) => {
         <Wrapper>
             <WrapperLine>
                 <Text>Tickets amount:</Text>
-                <Text>Balance: <b>456.3232 ICP</b></Text>
+                <Text>Balance: <b>{balance || 0} ICP</b></Text>
             </WrapperLine>
             <WrapperLine>
                 <div>

@@ -64,7 +64,7 @@ const AuthModal = () => {
             <Session>
                 <ICimg src="assets/ic-badge.svg" alt="Internet Computer"/>
                 <span>{username}</span>
-                <div>Balance: {balance} ICP</div>
+                <div>Balance: {balance || 0} ICP</div>
                 <div className="session-actions">
                     <CopyToClipboard text={username}>
                         <button className={"btn btn-transparent btn--small btn-with-ico"}>
