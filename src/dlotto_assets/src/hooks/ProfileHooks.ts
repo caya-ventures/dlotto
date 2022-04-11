@@ -1,29 +1,21 @@
-import {Identity} from '@dfinity/agent';
-import {ProfileUpdate} from '../../../declarations/dlotto/dlotto.did';
-import assert from 'assert';
-import { isDelegationValid } from "@dfinity/authentication";
-import { DelegationChain } from "@dfinity/identity";
-import {useEffect, useState} from 'react';
-import {get, remove, set} from 'local-storage';
+import { ActorSubclass, Identity } from '@dfinity/agent';
+import { _SERVICE, ProfileUpdate } from '../../../declarations/dlotto/dlotto.did';
+import { useEffect, useState } from 'react';
+import { get, remove, set } from 'local-storage';
+import { emptyProfile, profilesMatch } from '../utils';
+import toast from 'react-hot-toast';
+import * as React from 'react';
 
 type UseProfileProps = {
     identity?: Identity;
+    hasLoggedIn: boolean;
+    actor?: ActorSubclass<_SERVICE>;
+    setIsAuthenticated?: React.Dispatch<React.SetStateAction<boolean>>;
+    logout?: () => void;
 };
 
-export function profilesMatch(
-    p1: undefined | ProfileUpdate,
-    p2: ProfileUpdate
-) {
-    try {
-        assert.deepEqual(p1, p2);
-        return true;
-    } catch (error) {
-        return false;
-    }
-}
-
 export function useProfile(props: UseProfileProps) {
-    const { identity } = props;
+    const { identity, hasLoggedIn, actor, setIsAuthenticated, logout } = props;
     const [ profile, setProfile ] = useState<ProfileUpdate>();
 
     const updateProfile = (profile: ProfileUpdate | undefined) => {
@@ -33,6 +25,13 @@ export function useProfile(props: UseProfileProps) {
         setProfile(profile);
     };
 
+    const handleCreationError = () => {
+        remove("profile");
+        setIsAuthenticated?.(false);
+        updateProfile?.(emptyProfile);
+        toast.error("There was a problem creating your profile");
+    };
+
     useEffect(() => {
         const stored = JSON.parse(get('profile')) as ProfileUpdate | undefined;
         if (stored) {
@@ -40,20 +39,42 @@ export function useProfile(props: UseProfileProps) {
         }
     }, []);
 
+    useEffect(() => {
+        hasLoggedIn && actor?.read().then((result) => {
+            if ('ok' in result) {
+                if (profilesMatch(profile, result.ok)) {
+                    return;
+                }
+                updateProfile(result.ok);
+            } else {
+                if ('NotAuthorized' in result.err) {
+                    toast.error('Your session expired. Please reauthenticate');
+                    logout?.();
+                } else if ('NotFound' in result.err) {
+                    actor?.create().then(async (createResponse) => {
+                        if ("ok" in createResponse) {
+                            const profileResponse = await actor.read();
+                            if ("ok" in profileResponse) {
+                                updateProfile(profileResponse.ok);
+                                toast("Profile created.");
+                            } else {
+                                toast.error(profileResponse.err.toString());
+                                handleCreationError();
+                            }
+                        } else {
+                            handleCreationError();
+                            remove("ic-delegation");
+                            toast.error(createResponse.err.toString());
+                        }
+                    });
+                } else {
+                    toast.error('Error: ' + Object.keys(result.err)[0]);
+                }
+            }
+        });
+    }, [ hasLoggedIn, actor ]);
+
     if (!identity) return { profile: emptyProfile, updateProfile };
 
     return { profile, updateProfile };
 }
-
-export const emptyProfile: ProfileUpdate = {
-    bio: {
-        username: "",
-    },
-};
-
-export function checkDelegation() {
-    const delegations = localStorage.getItem("ic-delegation");
-    if (!delegations) return false;
-    const chain = DelegationChain.fromJSON(delegations);
-    return isDelegationValid(chain);
-  }

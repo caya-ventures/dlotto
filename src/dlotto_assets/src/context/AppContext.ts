@@ -1,10 +1,9 @@
 import * as React from 'react';
-import {AuthClient} from '@dfinity/auth-client';
-import {ActorSubclass} from '@dfinity/agent';
-import {_SERVICE, ProfileUpdate, Tokens} from '../../../declarations/dlotto/dlotto.did';
-import {emptyProfile} from '../hooks';
+import { AuthClient } from '@dfinity/auth-client';
+import { ActorSubclass } from '@dfinity/agent';
+import { _SERVICE, ProfileUpdate } from '../../../declarations/dlotto/dlotto.did';
+import { emptyProfile } from '../utils';
 
-// TODO: move auth logic to AuthContext
 export const AppContext = React.createContext<{
     authClient?: AuthClient;
     setAuthClient?: React.Dispatch<AuthClient>;
@@ -12,14 +11,16 @@ export const AppContext = React.createContext<{
     setIsAuthenticated?: React.Dispatch<React.SetStateAction<boolean>>;
     login: () => void;
     logout: () => void;
-    profileActor?: ActorSubclass<_SERVICE>;
+    actor?: ActorSubclass<_SERVICE>;
     profile?: ProfileUpdate;
     updateProfile?: React.Dispatch<ProfileUpdate>;
     hasLoggedIn: boolean;
     balance: string;
 }>({
-    login: () => {},
-    logout: () => {},
+    login: () => {
+    },
+    logout: () => {
+    },
     profile: emptyProfile,
     hasLoggedIn: false,
     balance: '',

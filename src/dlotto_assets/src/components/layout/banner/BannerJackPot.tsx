@@ -9,7 +9,6 @@ import { TICKET_PRICE } from '../../../config';
 import { Modal } from '../modals';
 import { TicketGrid } from '../tickets';
 import { AppContext, ModalContext } from '../../../context';
-import { useDlottoClient } from '../../../hooks';
 import { UserTicket } from '../../../../../declarations/dlotto/dlotto.did';
 import { Loader } from '../index';
 
@@ -103,9 +102,8 @@ const getCurrentRound = async () => await dlotto.getCurrentRound();
 
 const BannerJackPot = () => {
 
-    const { isAuthenticated } = useContext(AppContext);
+    const { isAuthenticated, actor } = useContext(AppContext);
     const { currentTicketsModal, setCurrentTicketsModal } = useContext(ModalContext);
-    const { actorDlotto } = useDlottoClient();
     const currentRound = useAsync(getCurrentRound, []).result;
     const [ userTickets, setUserTickets ]: [ UserTicket[] | [], (a: UserTicket[]) => void ] = useState([] as UserTicket[]);
     const [ isLoadingTicket, setIsLoadingTicket ] = useState(false);
@@ -114,14 +112,14 @@ const BannerJackPot = () => {
         let isMounted = true;
         if (currentRound?.round && isAuthenticated) {
             setIsLoadingTicket(true);
-            actorDlotto?.getUserTicket(currentRound?.round)
+            actor?.getUserTicket(currentRound?.round)
                 .then(result => isMounted && setUserTickets('ok' in result ? result.ok : []))
                 .finally(() => isMounted && setIsLoadingTicket(false));
         }
         return () => {
             isMounted = false;
         };
-    }, [ currentRound?.round, actorDlotto ]);
+    }, [ currentRound?.round, actor ]);
 
     const onViewTickets = () => {
         if (!currentRound) return;
