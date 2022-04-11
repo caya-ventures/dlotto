@@ -37,6 +37,14 @@ module {
     Blob.fromArray(append(crc32Bytes, hashSum));
   };
 
+  public func principalSubaccount(principal: Principal) : Blob {
+    let hash = SHA224.Digest();
+    hash.write(Blob.toArray(Principal.toBlob(principal)));
+    let hashSum = hash.sum();
+    let crc32Bytes = beBytes(CRC32.ofArray(hashSum));
+    Blob.fromArray(append(crc32Bytes, hashSum));
+  };
+
   public func validateAccountIdentifier(accountIdentifier : AccountIdentifier) : Bool {
     if (accountIdentifier.size() != 32) {
       return false;

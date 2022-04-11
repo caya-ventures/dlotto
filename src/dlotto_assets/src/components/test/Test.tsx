@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { useAsync } from 'react-async-hook';
 import { dlotto } from '../../../../declarations/dlotto';
+import { AccountIdentifier } from '../../../../declarations/dlotto/dlotto.did';
+import { canisterId, createActor } from '../../../../declarations/ledger';
+import { useLedgerClient } from '../../hooks';
 
 const getWinHistory = async () => await dlotto.getWinHistory(BigInt(93));
 // const getUserTicket = async () => await dlotto.generateUserTicket(BigInt(1));
@@ -9,9 +12,10 @@ const getUserTicketHistory = async () => await dlotto.getUserTicket(BigInt(9));
 
 const getUserBalance = async () => await dlotto.userBalance();
 const getUserId = async () => await dlotto.userId();
-//
-const Test = () => {
 
+
+const Test = () => {
+    const { actorLedger } = useLedgerClient();
     // const generateNumber = useAsync(getNumber, []);
     const getWinTicketHistory = useAsync(getWinHistory, []);
     // const generateUserTicket = useAsync(getUserTicket, []);
@@ -25,7 +29,23 @@ const Test = () => {
     
     let userBalance = useAsync(getUserBalance, []);
     let userId = useAsync(getUserId, []);
-    //const transferTokens = async () => await dlotto.tranferTokens();
+    let amount: bigint = BigInt(10000000);
+    let fee: bigint = BigInt(10000);
+    let getDepositAddress = async () => await dlotto.getDepositAddress();
+    let depositAddressBlob = useAsync(getDepositAddress, []).result as AccountIdentifier;
+    if(depositAddressBlob !== undefined) {
+        console.log(toHexString(depositAddressBlob));
+    }
+    const res = async () => await actorLedger?.transfer({
+        memo: BigInt(0x1),
+        amount: { e8s: amount },
+        fee: { e8s: fee},
+        to: depositAddressBlob,
+        from_subaccount: [],
+        created_at_time: [],
+    });
+    //actorLedger?.account_balance()
+    const transferTokens = async () => await dlotto.chargeICP();
     const [ isTransfering, setIsTransfering ] = useState<boolean>(false);
     // let winningNumbers;
     // if (generateWinningNumbers.result) {
@@ -33,12 +53,18 @@ const Test = () => {
     // } else {
     //     winningNumbers = 'Loading ...'
     // }
-    // const transfer = () => {
-    //     setIsTransfering(true);
-    //     transferTokens()
-    //     .then(r => console.log(r))
-    //         .finally(() => setIsTransfering(false));
-    // };
+    const charge = () => {
+        setIsTransfering(true);
+        res()
+        .then(r => console.log(r))
+            .finally(() => setIsTransfering(false));
+    };
+    const topup = () => {
+        setIsTransfering(true);
+        transferTokens()
+        .then(r => console.log(r))
+            .finally(() => setIsTransfering(false));
+    };
 
     return (
         <section>
@@ -46,12 +72,21 @@ const Test = () => {
             {/* <div>generateNumbersArray: {generateNumbersArray.result?.toString() || 'Loading ...'}</div> */}
             {/* <div>generateWinningNumbers: {generateWinningNumbers}</div> */}
             {<div>UserBalance: {userBalance.result?.e8s.toString()}</div>}
-            {/* {<button className="btn btn-blue btn--large" onClick={transfer} disabled={isTransfering}>
-                    {isTransfering ? 'Transfering' : 'Transfer 1 ICP to your balance'}
-                </button>} */}
+            {<button className="btn btn-blue btn--large" onClick={charge} disabled={isTransfering}>
+                    {isTransfering ? 'Charge' : 'Charge 1 ICP to your balance'}
+                </button>}
+                {<button className="btn btn-blue btn--large" onClick={topup} disabled={isTransfering}>
+                    {isTransfering ? 'Top up' : 'Top up 1 ICP to your balance'}
+                </button>}
             {<div>UserId: {userId.result}</div>}
         </section>
     );
 }
+
+export const toHexString = (byteArray: any) => {
+    return Array.from(byteArray, function(byte: any) {
+        return ('0' + (byte & 0xFF).toString(16)).slice(-2);
+    }).join('').toUpperCase();
+};
 
 export default Test;

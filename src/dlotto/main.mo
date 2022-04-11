@@ -24,7 +24,7 @@ import Ledger  "canister:ledger";
 import Account "./Account";
 import Types "./types";
 
-actor Dlotto {
+shared(init_msg) actor class Dlotto() = this {
     // db storage
     private stable var winHistoryStorage : Trie.Trie<Nat, Types.Ticket> = Trie.empty(); // round -> ticket
     private stable var userTicketStorage : Trie.Trie<Text, [Types.UserTicket]> = Trie.empty(); // user_round -> [user ticket]
@@ -142,6 +142,7 @@ actor Dlotto {
         var ticketNumber : Nat = 1;
         var userTickets = buffUserTickets.clone();
         let emptyUserTicket : Types.UserTicket = EmptyTicket.initEmptyUserTicket();
+        var chargeAmount: Nat64 = 0;
 
         var existingTickets : [Types.UserTicket] = switch (await getUserTicketByRound(msg.caller, round)) {
             case null [emptyUserTicket];
@@ -177,6 +178,7 @@ actor Dlotto {
             
             ticketNumber += 1;
             lastTicketCl += 1;
+            chargeAmount += 10_000_000;
         };
 
         let userRoundKey = getUserRoundKey(msg.caller, round);
@@ -190,6 +192,7 @@ actor Dlotto {
         );
 
         userTicketStorage := newUserTicketStorage;
+        //chargeICP(10_000_000, msg.caller);
 
         return userTicketsArr;
     };
@@ -552,8 +555,8 @@ actor Dlotto {
         };
     };
 
-    func canisterAccountId () : Account.AccountIdentifier {
-        Account.accountIdentifier(Principal.fromActor(Dlotto), Account.defaultSubaccount())
+    func canisterAccountId() : Account.AccountIdentifier {
+        Account.accountIdentifier(Principal.fromActor(this), Account.principalSubaccount(Principal.fromActor(this)))
     };
 
     private func userAccountId (principal : Principal) : Account.AccountIdentifier {
@@ -568,26 +571,31 @@ actor Dlotto {
         userAccountId(msg.caller);
     };
 
-    public query func canisterAccount () : async Account.AccountIdentifier {
-        canisterAccountId();
+    public func canisterAccount() : async Account.AccountIdentifier {
+        canisterAccountId()
     };
 
     public func canisterBalance () : async Ledger.Tokens {
         await Ledger.account_balance({ account = canisterAccountId() })
     };
 
-    public func tranferTokens (id : Account.AccountIdentifier, amount : Nat64): () {
+    public shared(msg) func getDepositAddress(): async Account.AccountIdentifier {
+        Account.accountIdentifier(Principal.fromActor(this), Account.principalSubaccount(msg.caller));
+    };
+
+    public shared(msg) func chargeICP(): async () {
+
         let res = await Ledger.transfer({
-            memo = Nat64.fromNat(10);
-            from_subaccount = null;
-            to = id;
-            amount = { e8s = amount };
+            memo: Nat64 = 0;
+            from_subaccount = ?Account.principalSubaccount(Principal.fromActor(this));
+            to = userAccountId(msg.caller);
+            amount = { e8s = 10_000_000 };
             fee = { e8s = 10_000 };
             created_at_time = ?{ timestamp_nanos = Nat64.fromNat(Int.abs(Time.now()))};
         });
         switch (res) {
             case (#Ok(blockIndex)) {
-            Debug.print("Paid reward to " # debug_show id # " in block " # debug_show blockIndex);
+            Debug.print("Paid reward in block " # debug_show blockIndex);
             };
             case (#Err(#InsufficientFunds { balance })) {
             throw Error.reject("Top me up! The balance is only " # debug_show balance # " e8s");

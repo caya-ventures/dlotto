@@ -2,6 +2,25 @@ import type { Principal } from '@dfinity/principal';
 export type AccountIdentifier = Array<number>;
 export interface Bio { 'username' : string }
 export type Date = bigint;
+export interface Dlotto {
+  'assignTicketToUser' : (arg_0: Array<Ticket>) => Promise<Array<UserTicket>>,
+  'canisterAccount' : () => Promise<AccountIdentifier>,
+  'canisterBalance' : () => Promise<Tokens>,
+  'chargeICP' : () => Promise<undefined>,
+  'create' : () => Promise<Result>,
+  'delete' : () => Promise<Result>,
+  'getAllWinHistory' : () => Promise<Array<[bigint, Ticket]>>,
+  'getCurrentRound' : () => Promise<Round>,
+  'getCurrentWinTicket' : () => Promise<Ticket>,
+  'getDepositAddress' : () => Promise<AccountIdentifier>,
+  'getTicketPrize' : (arg_0: bigint) => Promise<[] | [number]>,
+  'getUserTicket' : (arg_0: bigint) => Promise<Result_3>,
+  'getWinHistory' : (arg_0: bigint) => Promise<Result_2>,
+  'read' : () => Promise<Result_1>,
+  'update' : (arg_0: ProfileUpdate) => Promise<Result>,
+  'userBalance' : () => Promise<Tokens>,
+  'userId' : () => Promise<AccountIdentifier>,
+}
 export type Error = { 'NotFound' : null } |
   { 'NotAuthorized' : null } |
   { 'AlreadyExists' : null };
@@ -36,23 +55,4 @@ export interface UserTicket {
   'ticket_id' : TicketId,
   'user_id' : UserId,
 }
-export interface _SERVICE {
-  'assignTicketToUser' : (arg_0: Array<Ticket>) => Promise<Array<UserTicket>>,
-  'canisterAccount' : () => Promise<AccountIdentifier>,
-  'canisterBalance' : () => Promise<Tokens>,
-  'create' : () => Promise<Result>,
-  'delete' : () => Promise<Result>,
-  'getAllWinHistory' : () => Promise<Array<[bigint, Ticket]>>,
-  'getCurrentRound' : () => Promise<Round>,
-  'getCurrentWinTicket' : () => Promise<Ticket>,
-  'getTicketPrize' : (arg_0: bigint) => Promise<[] | [number]>,
-  'getUserTicket' : (arg_0: bigint) => Promise<Result_3>,
-  'getWinHistory' : (arg_0: bigint) => Promise<Result_2>,
-  'read' : () => Promise<Result_1>,
-  'tranferTokens' : (arg_0: AccountIdentifier, arg_1: bigint) => Promise<
-      undefined
-    >,
-  'update' : (arg_0: ProfileUpdate) => Promise<Result>,
-  'userBalance' : () => Promise<Tokens>,
-  'userId' : () => Promise<AccountIdentifier>,
-}
+export interface _SERVICE extends Dlotto {}

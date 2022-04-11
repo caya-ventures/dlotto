@@ -116,6 +116,7 @@ module.exports = {
       NODE_ENV: "development",
       DLOTTO_CANISTER_ID: canisters["dlotto"],
       DLOTTO_ASSETS_CANISTER_ID: canisters["dlotto_assets"],
+      LEDGER_CANISTER_ID: canisters["ledger"],
       II_URL: isDevelopment
         ? "http://localhost:8000?canisterId=" + localConfig["identityCanisterId"] + "#authorize"
         : "https://identity.ic0.app/#authorize",
