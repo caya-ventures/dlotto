@@ -12,7 +12,6 @@ import { Ticket, UserTicket } from '../../../../../declarations/dlotto/dlotto.di
 import { dateFromBigInt, normalizeTicketList } from "../../../utils";
 import DrawsInfo from "./DrawsInfo";
 import { Loader } from "../index";
-import { useDlottoClient } from "../../../hooks";
 import { AppContext, ModalContext } from "../../../context";
 import { Modal } from "../modals";
 import { TicketGrid } from "../tickets";
@@ -105,9 +104,8 @@ const getAllWinHistory = async () => await dlotto.getAllWinHistory();
 
 const Draws = () => {
     const winHistory = useAsync(getAllWinHistory, []);
-    const { isAuthenticated } = useContext(AppContext);
+    const { isAuthenticated, actor } = useContext(AppContext);
     const { userTicketsModal, setUserTicketsModal } = useContext(ModalContext);
-    const { actorDlotto } = useDlottoClient();
 
     const [ isDetailsActive, setIsDetailsActive ] = useState(false);
     const [ isLoadingTicket, setIsLoadingTicket ] = useState(false);
@@ -131,14 +129,14 @@ const Draws = () => {
         let isMounted = true;
         if (currentTicket?.round && isAuthenticated) {
             setIsLoadingTicket(true);
-            actorDlotto?.getUserTicket(currentTicket?.round?.round)
+            actor?.getUserTicket(currentTicket?.round?.round)
                 .then(result => isMounted && setUserTickets('ok' in result ? result.ok : []))
                 .finally(() => isMounted && setIsLoadingTicket(false));
         }
         return () => {
             isMounted = false;
         };
-    }, [ currentTicket?.round, actorDlotto ]);
+    }, [ currentTicket?.round, actor ]);
 
     const nextTicket = () => {
         if (isLoadingTicket) return;
