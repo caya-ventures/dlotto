@@ -4,7 +4,7 @@ import { AppContext } from "../../context";
 import { dlotto } from '../../../../declarations/dlotto';
 import { AccountIdentifier } from '../../../../declarations/dlotto/dlotto.did';
 import { canisterId, createActor } from '../../../../declarations/ledger';
-import { useLedgerClient, useDlottoClient } from '../../hooks';
+import { useLedgerClient } from '../../hooks';
 import { Principal } from '@dfinity/principal';
 
 const getWinHistory = async () => await dlotto.getWinHistory(BigInt(93));
@@ -18,7 +18,6 @@ const getUserId = async () => await dlotto.userId();
 
 const Test = () => {
     const { actorLedger } = useLedgerClient();
-    const { actorDlotto } = useDlottoClient();
     const { authClient } = useContext(AppContext);
     // const generateNumber = useAsync(getNumber, []);
     const getWinTicketHistory = useAsync(getWinHistory, []);
