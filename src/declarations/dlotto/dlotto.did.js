@@ -42,7 +42,7 @@ export const idlFactory = ({ IDL }) => {
       ),
     'canisterAccount' : IDL.Func([], [AccountIdentifier], []),
     'canisterBalance' : IDL.Func([], [Tokens], []),
-    'chargeICP' : IDL.Func([], [], []),
+    'chargeICP' : IDL.Func([IDL.Principal], [], []),
     'create' : IDL.Func([], [Result], []),
     'delete' : IDL.Func([], [Result], []),
     'getAllWinHistory' : IDL.Func(
@@ -58,6 +58,7 @@ export const idlFactory = ({ IDL }) => {
     'getWinHistory' : IDL.Func([IDL.Nat], [Result_2], []),
     'read' : IDL.Func([], [Result_1], ['query']),
     'update' : IDL.Func([ProfileUpdate], [Result], []),
+    'userAccountIdPublic' : IDL.Func([IDL.Principal], [AccountIdentifier], []),
     'userBalance' : IDL.Func([], [Tokens], []),
     'userId' : IDL.Func([], [AccountIdentifier], []),
   });

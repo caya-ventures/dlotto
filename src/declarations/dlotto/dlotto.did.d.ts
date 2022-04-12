@@ -6,7 +6,7 @@ export interface Dlotto {
   'assignTicketToUser' : (arg_0: Array<Ticket>) => Promise<Array<UserTicket>>,
   'canisterAccount' : () => Promise<AccountIdentifier>,
   'canisterBalance' : () => Promise<Tokens>,
-  'chargeICP' : () => Promise<undefined>,
+  'chargeICP' : (arg_0: Principal) => Promise<undefined>,
   'create' : () => Promise<Result>,
   'delete' : () => Promise<Result>,
   'getAllWinHistory' : () => Promise<Array<[bigint, Ticket]>>,
@@ -18,6 +18,7 @@ export interface Dlotto {
   'getWinHistory' : (arg_0: bigint) => Promise<Result_2>,
   'read' : () => Promise<Result_1>,
   'update' : (arg_0: ProfileUpdate) => Promise<Result>,
+  'userAccountIdPublic' : (arg_0: Principal) => Promise<AccountIdentifier>,
   'userBalance' : () => Promise<Tokens>,
   'userId' : () => Promise<AccountIdentifier>,
 }

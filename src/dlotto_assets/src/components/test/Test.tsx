@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { useAsync } from 'react-async-hook';
+import { AppContext } from "../../context";
 import { dlotto } from '../../../../declarations/dlotto';
 import { AccountIdentifier } from '../../../../declarations/dlotto/dlotto.did';
 import { canisterId, createActor } from '../../../../declarations/ledger';
-import { useLedgerClient } from '../../hooks';
+import { useLedgerClient, useDlottoClient } from '../../hooks';
+import { Principal } from '@dfinity/principal';
 
 const getWinHistory = async () => await dlotto.getWinHistory(BigInt(93));
 // const getUserTicket = async () => await dlotto.generateUserTicket(BigInt(1));
@@ -16,6 +18,8 @@ const getUserId = async () => await dlotto.userId();
 
 const Test = () => {
     const { actorLedger } = useLedgerClient();
+    const { actorDlotto } = useDlottoClient();
+    const { authClient } = useContext(AppContext);
     // const generateNumber = useAsync(getNumber, []);
     const getWinTicketHistory = useAsync(getWinHistory, []);
     // const generateUserTicket = useAsync(getUserTicket, []);
@@ -29,13 +33,17 @@ const Test = () => {
     
     let userBalance = useAsync(getUserBalance, []);
     let userId = useAsync(getUserId, []);
-    let amount: bigint = BigInt(10000000);
+    let amount: bigint = BigInt(555555);
     let fee: bigint = BigInt(10000);
-    let getDepositAddress = async () => await dlotto.getDepositAddress();
+    let getDepositAddress = async () => await dlotto.canisterAccount();
+    
     let depositAddressBlob = useAsync(getDepositAddress, []).result as AccountIdentifier;
     if(depositAddressBlob !== undefined) {
         console.log(toHexString(depositAddressBlob));
     }
+    let principal = authClient?.getIdentity().getPrincipal() as Principal;
+    console.log(principal);
+    let getAccountId = async () => await dlotto.userAccountIdPublic(principal);
     const res = async () => await actorLedger?.transfer({
         memo: BigInt(0x1),
         amount: { e8s: amount },
@@ -44,8 +52,15 @@ const Test = () => {
         from_subaccount: [],
         created_at_time: [],
     });
-    //actorLedger?.account_balance()
-    const transferTokens = async () => await dlotto.chargeICP();
+    
+    getAccountId().then(
+        a => actorLedger?.account_balance(
+            { 'account': a}
+            ).then(
+                b => console.log(b,a)
+                )
+        );
+    const transferTokens = async () => await dlotto.chargeICP(principal);
     const [ isTransfering, setIsTransfering ] = useState<boolean>(false);
     // let winningNumbers;
     // if (generateWinningNumbers.result) {

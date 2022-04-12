@@ -556,10 +556,14 @@ shared(init_msg) actor class Dlotto() = this {
     };
 
     func canisterAccountId() : Account.AccountIdentifier {
-        Account.accountIdentifier(Principal.fromActor(this), Account.principalSubaccount(Principal.fromActor(this)))
+        Account.accountIdentifier(Principal.fromActor(this), Account.defaultSubaccount())
     };
 
     private func userAccountId (principal : Principal) : Account.AccountIdentifier {
+        Account.accountIdentifier(principal, Account.defaultSubaccount())
+    };
+
+    public func userAccountIdPublic (principal : Principal) : async Account.AccountIdentifier {
         Account.accountIdentifier(principal, Account.defaultSubaccount())
     };
 
@@ -583,19 +587,18 @@ shared(init_msg) actor class Dlotto() = this {
         Account.accountIdentifier(Principal.fromActor(this), Account.principalSubaccount(msg.caller));
     };
 
-    public shared(msg) func chargeICP(): async () {
-
+    public func chargeICP(toAccount : Principal): async () {
         let res = await Ledger.transfer({
             memo: Nat64 = 0;
-            from_subaccount = ?Account.principalSubaccount(Principal.fromActor(this));
-            to = userAccountId(msg.caller);
-            amount = { e8s = 10_000_000 };
+            from_subaccount = null;
+            to = userAccountId(toAccount);
+            amount = { e8s = 100_000_000 };
             fee = { e8s = 10_000 };
             created_at_time = ?{ timestamp_nanos = Nat64.fromNat(Int.abs(Time.now()))};
         });
         switch (res) {
             case (#Ok(blockIndex)) {
-            Debug.print("Paid reward in block " # debug_show blockIndex);
+            Debug.print("Paid reward to Principal: " # debug_show toAccount # "and accountId" # debug_show userAccountId(toAccount));
             };
             case (#Err(#InsufficientFunds { balance })) {
             throw Error.reject("Top me up! The balance is only " # debug_show balance # " e8s");

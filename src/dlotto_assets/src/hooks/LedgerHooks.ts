@@ -14,6 +14,7 @@ export function useLedgerClient() {
     }, [ isAuthenticated ]);
 
     const initActor = () => {
+        console.log(authClient?.getIdentity());
         const actor = createActor(canisterId as string, {
             agentOptions: {
                 identity: authClient?.getIdentity(),
