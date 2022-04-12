@@ -5,8 +5,7 @@ import { TicketGenerate } from './';
 import { Ticket, UserTicket } from '../../../../../declarations/dlotto/dlotto.did';
 import TicketGrid from './TicketGrid';
 import { pluralPipe, randomNumbersArray, toTickets, toUserTickets } from '../../../utils';
-import { useDlottoClient } from '../../../hooks';
-import { ModalContext } from '../../../context';
+import { AppContext, ModalContext } from '../../../context';
 import { Modal } from '../modals';
 import TicketEdit from './TicketEdit';
 import { useHistory } from 'react-router-dom';
@@ -46,7 +45,7 @@ const ActionTitle = styled.p`
 `;
 
 const TicketBuy = () => {
-    const { actorDlotto } = useDlottoClient();
+    const { actor } = useContext(AppContext);
     const { ticketEditModal, setTicketEditModal } = useContext(ModalContext);
     const history = useHistory();
 
@@ -64,7 +63,7 @@ const TicketBuy = () => {
     const approveTickets = () => {
         if (isApproving) return;
         setIsApproving(true);
-        actorDlotto?.assignTicketToUser(tickets as Ticket[])
+        actor?.assignTicketToUser(tickets as Ticket[])
             .then((v) => {
                 // TODO: handle error
                 toast.success(`You have bought ${tickets?.length} ${pluralPipe(tickets?.length, 'ticket')}`);

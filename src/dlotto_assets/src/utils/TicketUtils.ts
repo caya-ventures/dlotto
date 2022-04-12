@@ -1,4 +1,4 @@
-import { Numbers, Round, Ticket, TicketId, UserTicket } from "../../../declarations/dlotto/dlotto.did";
+import { Ticket, UserTicket } from "../../../declarations/dlotto/dlotto.did";
 
 export const normalizeTicketList = (ticketList: [ bigint, Ticket ][]): Ticket[] => {
     return ticketList.map(([ , info ]) => {

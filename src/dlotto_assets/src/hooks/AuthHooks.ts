@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { AuthClient } from '@dfinity/auth-client';
 import { ActorSubclass } from '@dfinity/agent';
 import { canisterId, createActor, dlotto } from '../../../declarations/dlotto';
-import { Tokens, _SERVICE } from '../../../declarations/dlotto/dlotto.did';
+import { _SERVICE } from '../../../declarations/dlotto/dlotto.did';
 import { clear } from 'local-storage';
 import { useAsync } from 'react-async-hook';
 
@@ -56,12 +56,17 @@ export function useAuthClient(props?: UseAuthClientProps) {
             const isAuthenticated = await client.isAuthenticated();
             setAuthClient(client);
             setIsAuthenticated(isAuthenticated);
+            initActor();
         });
     }, []);
 
     useEffect(() => {
         if (isAuthenticated) initActor();
     }, [ isAuthenticated ]);
+
+    useEffect(() => {
+        setBalance(userBalance);
+    }, [ userBalance ]);
 
     return {
         authClient,
