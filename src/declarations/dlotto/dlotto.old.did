@@ -59,24 +59,23 @@ type Bio = record {username: text;};
 type AccountIdentifier = blob;
 service : {
   assignTicketToUser: (vec Ticket) -> (vec UserTicket);
-  canisterAccount: () -> (AccountIdentifier);
+  canisterAccount: () -> (AccountIdentifier) query;
   canisterBalance: () -> (Tokens);
-  chargeICP: (principal) -> ();
   create: () -> (Result);
   delete: () -> (Result);
+  generateWinningTicket: () -> (Ticket);
   getAllWinHistory: () -> (vec record {
                                  nat;
                                  Ticket;
                                });
   getCurrentRound: () -> (Round);
   getCurrentWinTicket: () -> (Ticket);
-  getDepositAddress: () -> (AccountIdentifier);
   getTicketPrize: (nat) -> (opt float64);
   getUserTicket: (nat) -> (Result_3);
   getWinHistory: (nat) -> (Result_2);
   read: () -> (Result_1) query;
+  tranferTokens: (AccountIdentifier, nat64) -> () oneway;
   update: (ProfileUpdate) -> (Result);
-  userAccountIdPublic: (principal) -> (AccountIdentifier);
   userBalance: () -> (Tokens);
   userId: () -> (AccountIdentifier);
 }

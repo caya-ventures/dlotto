@@ -3,8 +3,6 @@ import { useAsync } from 'react-async-hook';
 import { AppContext } from "../../context";
 import { dlotto } from '../../../../declarations/dlotto';
 import { AccountIdentifier } from '../../../../declarations/dlotto/dlotto.did';
-import { canisterId, createActor } from '../../../../declarations/ledger';
-import { useLedgerClient } from '../../hooks';
 import { Principal } from '@dfinity/principal';
 
 const getWinHistory = async () => await dlotto.getWinHistory(BigInt(93));
@@ -17,8 +15,7 @@ const getUserId = async () => await dlotto.userId();
 
 
 const Test = () => {
-    const { actorLedger } = useLedgerClient();
-    const { authClient } = useContext(AppContext);
+    const { authClient, ledger } = useContext(AppContext);
     // const generateNumber = useAsync(getNumber, []);
     const getWinTicketHistory = useAsync(getWinHistory, []);
     // const generateUserTicket = useAsync(getUserTicket, []);
@@ -43,7 +40,7 @@ const Test = () => {
     let principal = authClient?.getIdentity().getPrincipal() as Principal;
     console.log(principal);
     let getAccountId = async () => await dlotto.userAccountIdPublic(principal);
-    const res = async () => await actorLedger?.transfer({
+    const res = async () => await ledger?.transfer({
         memo: BigInt(0x1),
         amount: { e8s: amount },
         fee: { e8s: fee},
@@ -53,7 +50,7 @@ const Test = () => {
     });
     
     getAccountId().then(
-        a => actorLedger?.account_balance(
+        a => ledger?.account_balance(
             { 'account': a}
             ).then(
                 b => console.log(b,a)

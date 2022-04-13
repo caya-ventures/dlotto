@@ -2,6 +2,7 @@ import * as React from 'react';
 import { AuthClient } from '@dfinity/auth-client';
 import { ActorSubclass } from '@dfinity/agent';
 import { _SERVICE, ProfileUpdate } from '../../../declarations/dlotto/dlotto.did';
+import { _SERVICE as _LEDGER } from '../../../declarations/ledger/ledger.did';
 import { emptyProfile } from '../utils';
 
 export const AppContext = React.createContext<{
@@ -12,6 +13,7 @@ export const AppContext = React.createContext<{
     login: () => void;
     logout: () => void;
     actor?: ActorSubclass<_SERVICE>;
+    ledger?: ActorSubclass<_LEDGER>;
     profile?: ProfileUpdate;
     updateProfile?: React.Dispatch<ProfileUpdate>;
     hasLoggedIn: boolean;

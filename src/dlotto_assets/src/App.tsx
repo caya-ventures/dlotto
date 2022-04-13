@@ -27,6 +27,7 @@ const App = () => {
         login,
         logout,
         actor,
+        ledger,
         hasLoggedIn,
         balance,
     } = useAuthClient();
@@ -67,6 +68,7 @@ const App = () => {
                 hasLoggedIn,
                 balance,
                 actor,
+                ledger,
             }}
         >
             <ModalContext.Provider

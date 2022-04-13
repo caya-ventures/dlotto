@@ -3,31 +3,27 @@ import { AuthClient } from '@dfinity/auth-client';
 import { ActorSubclass } from '@dfinity/agent';
 import { canisterId, createActor, dlotto } from '../../../declarations/dlotto';
 import { _SERVICE } from '../../../declarations/dlotto/dlotto.did';
+import { canisterId as ledgerCanisterId, createActor as createLedger } from '../../../declarations/ledger';
+import { _SERVICE as _LEDGER } from '../../../declarations/ledger/ledger.did';
 import { clear } from 'local-storage';
-import { useAsync } from 'react-async-hook';
-
+import { Principal } from '@dfinity/principal';
 
 type UseAuthClientProps = {};
 
 export function useAuthClient(props?: UseAuthClientProps) {
     const [ authClient, setAuthClient ] = useState<AuthClient>();
     const [ actor, setActor ] = useState<ActorSubclass<_SERVICE>>();
+    const [ ledger, setLedger ] = useState<ActorSubclass<_LEDGER>>();
     const [ isAuthenticated, setIsAuthenticated ] = useState<boolean>(false);
     const [ hasLoggedIn, setHasLoggedIn ] = useState(false);
-    const [ balance, setBalance ] = useState<string>('');
-
-    const getUserBalance = async () => await dlotto.userBalance();
-    let balanceCalc = Number( useAsync(getUserBalance, []).result?.e8s)/100000000;
-    let userBalance = balanceCalc.toFixed(3);
-
+    const [ balance, setBalance ] = useState<string>('0');
 
     const login = () => {
         authClient?.login({
             identityProvider: process.env.II_URL,
             onSuccess: () => {
-                initActor();
                 setIsAuthenticated(true);
-                setBalance(userBalance);
+                initActors();
                 setTimeout(() => {
                     setHasLoggedIn(true);
                 }, 100);
@@ -35,38 +31,53 @@ export function useAuthClient(props?: UseAuthClientProps) {
         });
     };
 
-    const initActor = () => {
-        const actor = createActor(canisterId as string, {
+    const initActors = () => {
+        setActor(createActor(canisterId as string, {
             agentOptions: {
                 identity: authClient?.getIdentity(),
             },
-        });
-        setActor(actor);
+        }));
+        setLedger(createLedger(ledgerCanisterId as string, {
+            agentOptions: {
+                identity: authClient?.getIdentity(),
+            },
+        }));
     };
 
     const logout = () => {
         clear();
         setIsAuthenticated(false);
         setActor(undefined);
+        setLedger(undefined);
+        setBalance('0');
     };
-
 
     useEffect(() => {
         AuthClient.create().then(async (client) => {
             const isAuthenticated = await client.isAuthenticated();
             setAuthClient(client);
             setIsAuthenticated(isAuthenticated);
-            initActor();
+            isAuthenticated && initActors();
         });
     }, []);
 
     useEffect(() => {
-        if (isAuthenticated) initActor();
+        if (isAuthenticated) initActors();
     }, [ isAuthenticated ]);
 
     useEffect(() => {
-        setBalance(userBalance);
-    }, [ userBalance ]);
+        if (!authClient || !ledger) {
+            return;
+        }
+        const getBalance = async () => {
+            const principal = authClient.getIdentity()?.getPrincipal() as Principal;
+            const accountId = await dlotto.userAccountIdPublic(principal);
+            const balance = await ledger.account_balance({'account': accountId})
+            const balanceCalc = (Number( balance?.e8s)/100000000).toFixed(3);
+                setBalance(balanceCalc);
+        }
+        getBalance();
+    }, [ ledger, authClient ]);
 
     return {
         authClient,
@@ -78,5 +89,6 @@ export function useAuthClient(props?: UseAuthClientProps) {
         actor,
         hasLoggedIn,
         balance,
+        ledger,
     };
 }
