@@ -30,6 +30,7 @@ const App = () => {
         ledger,
         hasLoggedIn,
         balance,
+        updateBalance,
     } = useAuthClient();
     const modalClient = useModalClient();
     const identity = authClient?.getIdentity();
@@ -69,6 +70,7 @@ const App = () => {
                 balance,
                 actor,
                 ledger,
+                updateBalance,
             }}
         >
             <ModalContext.Provider

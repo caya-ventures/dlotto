@@ -12,6 +12,7 @@ export const AppContext = React.createContext<{
     setIsAuthenticated?: React.Dispatch<React.SetStateAction<boolean>>;
     login: () => void;
     logout: () => void;
+    updateBalance: () => void;
     actor?: ActorSubclass<_SERVICE>;
     ledger?: ActorSubclass<_LEDGER>;
     profile?: ProfileUpdate;
@@ -22,6 +23,8 @@ export const AppContext = React.createContext<{
     login: () => {
     },
     logout: () => {
+    },
+    updateBalance: () => {
     },
     profile: emptyProfile,
     hasLoggedIn: false,

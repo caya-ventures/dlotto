@@ -18,40 +18,6 @@ export function useAuthClient(props?: UseAuthClientProps) {
     const [ hasLoggedIn, setHasLoggedIn ] = useState(false);
     const [ balance, setBalance ] = useState<string>('0');
 
-    const login = () => {
-        authClient?.login({
-            identityProvider: process.env.II_URL,
-            onSuccess: () => {
-                setIsAuthenticated(true);
-                initActors();
-                setTimeout(() => {
-                    setHasLoggedIn(true);
-                }, 100);
-            },
-        });
-    };
-
-    const initActors = () => {
-        setActor(createActor(canisterId as string, {
-            agentOptions: {
-                identity: authClient?.getIdentity(),
-            },
-        }));
-        setLedger(createLedger(ledgerCanisterId as string, {
-            agentOptions: {
-                identity: authClient?.getIdentity(),
-            },
-        }));
-    };
-
-    const logout = () => {
-        clear();
-        setIsAuthenticated(false);
-        setActor(undefined);
-        setLedger(undefined);
-        setBalance('0');
-    };
-
     useEffect(() => {
         AuthClient.create().then(async (client) => {
             const isAuthenticated = await client.isAuthenticated();
@@ -69,15 +35,55 @@ export function useAuthClient(props?: UseAuthClientProps) {
         if (!authClient || !ledger) {
             return;
         }
+        updateBalance();
+    }, [ ledger, authClient ]);
+
+    const login = () => {
+        authClient?.login({
+            identityProvider: process.env.II_URL,
+            onSuccess: () => {
+                setIsAuthenticated(true);
+                initActors();
+                setTimeout(() => {
+                    setHasLoggedIn(true);
+                }, 100);
+            },
+        });
+    };
+
+    const initActors = () => {
+        if (!authClient?.getIdentity()) return;
+
+        setActor(createActor(canisterId as string, {
+            agentOptions: {
+                identity: authClient?.getIdentity(),
+            },
+        }));
+        setLedger(createLedger(ledgerCanisterId as string, {
+            agentOptions: {
+                identity: authClient?.getIdentity(),
+            },
+        }));
+    };
+
+    const updateBalance = () => {
         const getBalance = async () => {
-            const principal = authClient.getIdentity()?.getPrincipal() as Principal;
+            const principal = authClient?.getIdentity()?.getPrincipal() as Principal;
             const accountId = await dlotto.userAccountIdPublic(principal);
-            const balance = await ledger.account_balance({'account': accountId})
+            const balance = await ledger?.account_balance({'account': accountId})
             const balanceCalc = (Number( balance?.e8s)/100000000).toFixed(3);
-                setBalance(balanceCalc);
+            setBalance(balanceCalc);
         }
         getBalance();
-    }, [ ledger, authClient ]);
+    }
+
+    const logout = () => {
+        clear();
+        setIsAuthenticated(false);
+        setActor(undefined);
+        setLedger(undefined);
+        setBalance('0');
+    };
 
     return {
         authClient,
@@ -90,5 +96,6 @@ export function useAuthClient(props?: UseAuthClientProps) {
         hasLoggedIn,
         balance,
         ledger,
+        updateBalance,
     };
 }

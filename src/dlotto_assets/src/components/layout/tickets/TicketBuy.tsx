@@ -2,7 +2,7 @@ import React, { useContext, useState } from 'react';
 import styled from "styled-components";
 import { baseTheme } from '../../../styles/theme';
 import { TicketGenerate } from './';
-import { Ticket, UserTicket } from '../../../../../declarations/dlotto/dlotto.did';
+import { AccountIdentifier, Ticket, UserTicket } from '../../../../../declarations/dlotto/dlotto.did';
 import TicketGrid from './TicketGrid';
 import { pluralPipe, randomNumbersArray, toTickets, toUserTickets } from '../../../utils';
 import { AppContext, ModalContext } from '../../../context';
@@ -11,6 +11,8 @@ import TicketEdit from './TicketEdit';
 import { useHistory } from 'react-router-dom';
 import { SvgCross } from '../../svg';
 import toast from 'react-hot-toast';
+import { TICKET_PRICE } from '../../../config';
+import { TransferError, TransferResult } from '../../../../../declarations/ledger/ledger.did';
 
 const BuyWrapper = styled.div`
   max-width: 32rem;
@@ -45,7 +47,7 @@ const ActionTitle = styled.p`
 `;
 
 const TicketBuy = () => {
-    const { actor } = useContext(AppContext);
+    const { actor, ledger, updateBalance } = useContext(AppContext);
     const { ticketEditModal, setTicketEditModal } = useContext(ModalContext);
     const history = useHistory();
 
@@ -60,20 +62,41 @@ const TicketBuy = () => {
         history.push('/');
     };
 
-    const approveTickets = () => {
+    const approveTickets = async () => {
         if (isApproving) return;
         setIsApproving(true);
-        actor?.assignTicketToUser(tickets as Ticket[])
-            .then((v) => {
-                // TODO: handle error
-                toast.success(`You have bought ${tickets?.length} ${pluralPipe(tickets?.length, 'ticket')}`);
-                // TODO: update balance
-            })
-            .finally(() => {
-                setIsApproving(false);
-                goBack();
-            });
+
+        const chargeResult = await chargeForTickets(tickets?.length || 0) as TransferResult;
+
+        if ('Err' in chargeResult) {
+            toast.error(JSON.stringify(chargeResult.Err as TransferError));
+            return;
+        }
+
+        updateBalance();
+        await actor?.assignTicketToUser(tickets as Ticket[]);
+
+        toast.success(`You have bought ${tickets?.length} ${pluralPipe(tickets?.length, 'ticket')}`);
+
+        setIsApproving(false);
+        goBack();
     };
+
+    const chargeForTickets = async (ticketAmount: number): Promise<TransferResult> => {
+        const depositAddressBlob = await actor?.canisterAccount();
+        const amount: bigint = BigInt(ticketAmount * TICKET_PRICE * 100000000);
+        const fee: bigint = BigInt(10000);
+
+        // TODO: replace with a more reliable way to charge users
+        return ledger?.transfer({
+            memo: BigInt(0x1),
+            amount: { e8s: amount },
+            fee: { e8s: fee},
+            to: depositAddressBlob as AccountIdentifier,
+            from_subaccount: [],
+            created_at_time: [],
+        }) as Promise<TransferResult>;
+    }
 
     const generateTickets = (count: number) => {
         const numbers = randomNumbersArray(count);
