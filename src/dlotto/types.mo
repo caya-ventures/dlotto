@@ -1,5 +1,7 @@
 import Int "mo:base/Int";
 import Nat "mo:base/Nat";
+import Float "mo:base/Float";
+import Bool "mo:base/Bool";
 import Text "mo:base/Text";
 
 module {
@@ -43,15 +45,15 @@ module {
   };
 
   public type UserPrize = {
-    user_ticket: UserTicket;
-    prize_level: Nat;
-    prize_amount: Nat;
+    score: Float;
+    isClaimed: Bool;
   };
 
   public type Error = {
     #NotFound;
     #AlreadyExists;
     #NotAuthorized;
+    #Ok
   };
 
   public type Bio = {

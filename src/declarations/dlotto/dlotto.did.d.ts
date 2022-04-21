@@ -9,13 +9,15 @@ export interface Dlotto {
   'canisterAccount' : () => Promise<AccountIdentifier>,
   'canisterBalance' : () => Promise<Tokens>,
   'chargeICP' : (arg_0: bigint, arg_1: Principal) => Promise<undefined>,
+  'claimICP' : (arg_0: bigint, arg_1: Principal) => Promise<undefined>,
+  'claimTicketPrize' : (arg_0: bigint, arg_1: Principal) => Promise<Error>,
   'create' : () => Promise<Result>,
   'delete' : () => Promise<Result>,
+  'generateWinningTicket' : () => Promise<Ticket>,
   'getAllWinHistory' : () => Promise<Array<[bigint, Ticket]>>,
   'getCurrentRound' : () => Promise<Round>,
   'getCurrentWinTicket' : () => Promise<Ticket>,
   'getDepositAddress' : (arg_0: Principal) => Promise<AccountIdentifier>,
-  'getTicketPrize' : (arg_0: bigint) => Promise<[] | [number]>,
   'getUserTicket' : (arg_0: bigint) => Promise<Result_3>,
   'getWinHistory' : (arg_0: bigint) => Promise<Result_2>,
   'read' : () => Promise<Result_1>,
@@ -23,7 +25,8 @@ export interface Dlotto {
   'userAccountIdPublic' : (arg_0: Principal) => Promise<AccountIdentifier>,
   'userId' : () => Promise<AccountIdentifier>,
 }
-export type Error = { 'NotFound' : null } |
+export type Error = { 'Ok' : null } |
+  { 'NotFound' : null } |
   { 'NotAuthorized' : null } |
   { 'AlreadyExists' : null };
 export type Numbers = Array<bigint>;

@@ -9,6 +9,7 @@ type Ticket =
     round : Round;
     super : Numbers
   };
+type UserPrize = {isClaimed : Bool; score : Float};
 type UserTicket = {ticket : Ticket; ticket_id : TicketId; user_id : UserId};
 actor {
   stable var lastTicketCl : Nat;
@@ -23,7 +24,7 @@ actor {
   stable var startClFrom : Nat;
   stable var startTime : Int;
   stable var ticketPrizeStorage :
-    {#branch : Branch<Nat, Float>; #empty; #leaf : Leaf<Nat, Float>};
+    {#branch : Branch<Nat, UserPrize>; #empty; #leaf : Leaf<Nat, UserPrize>};
   stable var ticketStorage :
     {
       #branch : Branch<Nat, UserTicket>;

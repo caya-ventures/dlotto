@@ -18,6 +18,8 @@ import Trie "mo:base/Trie";
 import Error "mo:base/Error";
 import Hash "mo:base/Hash";
 import Nat64 "mo:base/Nat64";
+import Int64 "mo:base/Int64";
+import Bool "mo:base/Bool";
 
 import Ledger  "canister:ledger";
 
@@ -29,7 +31,7 @@ shared(init_msg) actor class Dlotto() = this {
     private stable var winHistoryStorage : Trie.Trie<Nat, Types.Ticket> = Trie.empty(); // round -> ticket
     private stable var userTicketStorage : Trie.Trie<Text, [Types.UserTicket]> = Trie.empty(); // user_round -> [user ticket]
     private stable var ticketStorage : Trie.Trie<Nat, Types.UserTicket> = Trie.empty(); // entityId -> user ticket
-    private stable var ticketPrizeStorage : Trie.Trie<Nat, Float> = Trie.empty(); // entityId -> user ticket prize
+    private stable var ticketPrizeStorage : Trie.Trie<Nat, Types.UserPrize> = Trie.empty(); // entityId -> user ticket prize
     private stable var round : Nat = 1;
     private stable var prizePot : Nat = 100;
     private stable var startClFrom : Nat = 1; // starting position for ticket for current round
@@ -61,7 +63,7 @@ shared(init_msg) actor class Dlotto() = this {
     };
 
     // generates winning ticket for currend draw
-    private func generateWinningTicket () : async Types.Ticket {
+    public func generateWinningTicket () : async Types.Ticket {
         let ticket : Types.Ticket = await generateTicket();
 
         updateTicketsHistory(round, ticket);
@@ -281,28 +283,28 @@ shared(init_msg) actor class Dlotto() = this {
         for ((key, ticketScore) in ticketScoreArr.vals()) {
             switch (ticketScore) {
                 case (0) {
-                    setTicketPrize(key, 0);
+                    setTicketPrize(key, {score = 0; isClaimed = false});
                 };
                 case (10 or 11) {
-                    setTicketPrize(key, 0.05);
+                    setTicketPrize(key, {score = 0.05; isClaimed = false});
                 };
                 case (12) {
-                    setTicketPrize(key, 0.1);
+                    setTicketPrize(key, {score = 0.1; isClaimed = false});
                 };
                 case (3) {
-                    setTicketPrize(key, 0.5);
+                    setTicketPrize(key, {score = 0.5; isClaimed = false});
                 };
                 case (13) {
-                    setTicketPrize(key, 1);
+                    setTicketPrize(key, {score = 1; isClaimed = false});
                 };
                 case (4) {
-                    setTicketPrize(key, 5);
+                    setTicketPrize(key, {score = 5; isClaimed = false});
                 };
                 case (14) {
                     jackpotWinners.add(key);
                 };
                 case (_) {
-                    setTicketPrize(key, 0);
+                    setTicketPrize(key, {score = 0; isClaimed = false});
                 };
             }
         };
@@ -315,24 +317,24 @@ shared(init_msg) actor class Dlotto() = this {
                 );
 
             for (jackpotWinner in jackpotWinners.vals()) {
-                setTicketPrize(jackpotWinner, jackpot);
+                setTicketPrize(jackpotWinner, {score = jackpot; isClaimed = false});
             };
         };
     };
 
     // save ticket prize in memory
-    private func setTicketPrize (ticketKey : Nat, score : Float) {
+    private func setTicketPrize (ticketKey : Nat, prize : Types.UserPrize) {
         let (newTicketPrizeStorage, oldTicketPrizeStorage) = Trie.put(
             ticketPrizeStorage,
             Utils.natKey(ticketKey),
             Nat.equal,
-            score
+            prize
         );
 
         ticketPrizeStorage := newTicketPrizeStorage;
     };
     
-    public func getTicketPrize (entityId : Nat) : async ?Float {
+    private func getTicketPrize (entityId : Nat) : ?Types.UserPrize {
         let ticketPrize = Trie.find(
             ticketPrizeStorage,
             Utils.natKey(entityId),
@@ -342,6 +344,18 @@ shared(init_msg) actor class Dlotto() = this {
 
     // TODO - check if prize is already claimed
     // claim prize - amount, principal id
+    public func claimTicketPrize (ticketId: Nat, userPrincipal: Principal): async Types.Error {
+        let prize = getTicketPrize(ticketId);
+        switch(prize) {
+            case null #NotFound;
+            case (?prize) {
+                let amount:Int64 = 100_000_000 * Float.toInt64(prize.score);
+                let res = await claimICP(Int64.toNat64(amount), userPrincipal);
+                #Ok;
+            }
+        }
+        
+    };
 
     private func convertToUserTicket (ticket : ?Types.UserTicket) : Types.UserTicket {
         let emptyUserTicket = EmptyTicket.initEmptyUserTicket();
@@ -623,12 +637,12 @@ shared(init_msg) actor class Dlotto() = this {
         };
     };
 
-     public func claimICP(toAccount : Principal): async () {
+     public func claimICP(amount: Nat64, toAccount : Principal): async () {
         let res = await Ledger.transfer({
             memo: Nat64 = 0;
             from_subaccount = null;
             to = userAccountId(toAccount);
-            amount = { e8s = 100_000_000 };
+            amount = { e8s = amount };
             fee = { e8s = 10_000 };
             created_at_time = ?{ timestamp_nanos = Nat64.fromNat(Int.abs(Time.now()))};
         });

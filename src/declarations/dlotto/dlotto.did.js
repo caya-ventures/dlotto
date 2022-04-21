@@ -23,6 +23,7 @@ export const idlFactory = ({ IDL }) => {
   const AccountIdentifier = IDL.Vec(IDL.Nat8);
   const Tokens = IDL.Record({ 'e8s' : IDL.Nat64 });
   const Error = IDL.Variant({
+    'Ok' : IDL.Null,
     'NotFound' : IDL.Null,
     'NotAuthorized' : IDL.Null,
     'AlreadyExists' : IDL.Null,
@@ -43,8 +44,11 @@ export const idlFactory = ({ IDL }) => {
     'canisterAccount' : IDL.Func([], [AccountIdentifier], []),
     'canisterBalance' : IDL.Func([], [Tokens], []),
     'chargeICP' : IDL.Func([IDL.Nat64, IDL.Principal], [], []),
+    'claimICP' : IDL.Func([IDL.Nat64, IDL.Principal], [], []),
+    'claimTicketPrize' : IDL.Func([IDL.Nat, IDL.Principal], [Error], []),
     'create' : IDL.Func([], [Result], []),
     'delete' : IDL.Func([], [Result], []),
+    'generateWinningTicket' : IDL.Func([], [Ticket], []),
     'getAllWinHistory' : IDL.Func(
         [],
         [IDL.Vec(IDL.Tuple(IDL.Nat, Ticket))],
@@ -53,7 +57,6 @@ export const idlFactory = ({ IDL }) => {
     'getCurrentRound' : IDL.Func([], [Round], []),
     'getCurrentWinTicket' : IDL.Func([], [Ticket], []),
     'getDepositAddress' : IDL.Func([IDL.Principal], [AccountIdentifier], []),
-    'getTicketPrize' : IDL.Func([IDL.Nat], [IDL.Opt(IDL.Float64)], []),
     'getUserTicket' : IDL.Func([IDL.Nat], [Result_3], []),
     'getWinHistory' : IDL.Func([IDL.Nat], [Result_2], []),
     'read' : IDL.Func([], [Result_1], ['query']),

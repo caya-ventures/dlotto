@@ -58,12 +58,14 @@ type Date = int;
 type Bio = record {username: text;};
 type AccountIdentifier = blob;
 service : {
-  assignTicketToUser: (vec Ticket) -> (vec UserTicket);
+  assignTicketToUser: (vec Ticket, principal) -> (vec UserTicket);
   canisterAccount: () -> (AccountIdentifier);
   canisterBalance: () -> (Tokens);
-  chargeICP: (principal) -> ();
+  chargeICP: (nat64, principal) -> ();
+  claimICP: (principal) -> ();
   create: () -> (Result);
   delete: () -> (Result);
+  generateWinningTicket: () -> (Ticket);
   getAllWinHistory: () -> (vec record {
                                  nat;
                                  Ticket;
@@ -77,6 +79,5 @@ service : {
   read: () -> (Result_1) query;
   update: (ProfileUpdate) -> (Result);
   userAccountIdPublic: (principal) -> (AccountIdentifier);
-  userBalance: () -> (Tokens);
   userId: () -> (AccountIdentifier);
 }
