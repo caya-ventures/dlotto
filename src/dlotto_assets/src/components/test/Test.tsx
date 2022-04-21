@@ -10,7 +10,6 @@ const getWinHistory = async () => await dlotto.getWinHistory(BigInt(93));
 const getUserTicketHistory = async () => await dlotto.getUserTicket(BigInt(9)); 
 
 
-const getUserBalance = async () => await dlotto.userBalance();
 const getUserId = async () => await dlotto.userId();
 
 
@@ -27,7 +26,6 @@ const Test = () => {
 
     console.log(receiveUserTicketHistory);
     
-    let userBalance = useAsync(getUserBalance, []);
     let userId = useAsync(getUserId, []);
     let amount: bigint = BigInt(555555);
     let fee: bigint = BigInt(10000);
@@ -56,7 +54,6 @@ const Test = () => {
                 b => console.log(b,a)
                 )
         );
-    const transferTokens = async () => await dlotto.chargeICP(principal);
     const [ isTransfering, setIsTransfering ] = useState<boolean>(false);
     // let winningNumbers;
     // if (generateWinningNumbers.result) {
@@ -70,24 +67,14 @@ const Test = () => {
         .then(r => console.log(r))
             .finally(() => setIsTransfering(false));
     };
-    const topup = () => {
-        setIsTransfering(true);
-        transferTokens()
-        .then(r => console.log(r))
-            .finally(() => setIsTransfering(false));
-    };
 
     return (
         <section>
             {/* <div>generateNumber: {generateNumber.result?.toString() || 'Loading ...'}</div> */}
             {/* <div>generateNumbersArray: {generateNumbersArray.result?.toString() || 'Loading ...'}</div> */}
             {/* <div>generateWinningNumbers: {generateWinningNumbers}</div> */}
-            {<div>UserBalance: {userBalance.result?.e8s.toString()}</div>}
             {<button className="btn btn-blue btn--large" onClick={charge} disabled={isTransfering}>
                     {isTransfering ? 'Charge' : 'Charge 1 ICP to your balance'}
-                </button>}
-                {<button className="btn btn-blue btn--large" onClick={topup} disabled={isTransfering}>
-                    {isTransfering ? 'Top up' : 'Top up 1 ICP to your balance'}
                 </button>}
             {<div>UserId: {userId.result}</div>}
         </section>

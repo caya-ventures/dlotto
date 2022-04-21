@@ -13,6 +13,7 @@ import { SvgCross } from '../../svg';
 import toast from 'react-hot-toast';
 import { TICKET_PRICE } from '../../../config';
 import { TransferError, TransferResult } from '../../../../../declarations/ledger/ledger.did';
+import { Principal } from '@dfinity/principal';
 
 const BuyWrapper = styled.div`
   max-width: 32rem;
@@ -47,7 +48,7 @@ const ActionTitle = styled.p`
 `;
 
 const TicketBuy = () => {
-    const { actor, ledger, updateBalance } = useContext(AppContext);
+    const { actor, ledger, updateBalance, authClient } = useContext(AppContext);
     const { ticketEditModal, setTicketEditModal } = useContext(ModalContext);
     const history = useHistory();
 
@@ -56,6 +57,7 @@ const TicketBuy = () => {
 
     const [ currentTicketId, setCurrentTicketId ] = useState(0 as number);
     const [ isApproving, setIsApproving ] = useState(false as boolean);
+    var userPrincipal = authClient?.getIdentity().getPrincipal() as Principal;
 
 
     const goBack = () => {
@@ -74,7 +76,7 @@ const TicketBuy = () => {
         }
 
         updateBalance();
-        await actor?.assignTicketToUser(tickets as Ticket[]);
+        await actor?.assignTicketToUser(tickets as Ticket[], userPrincipal);
 
         toast.success(`You have bought ${tickets?.length} ${pluralPipe(tickets?.length, 'ticket')}`);
 
@@ -83,14 +85,14 @@ const TicketBuy = () => {
     };
 
     const chargeForTickets = async (ticketAmount: number): Promise<TransferResult> => {
-        const depositAddressBlob = await actor?.canisterAccount();
+        const depositAddressBlob = await actor?.getDepositAddress(userPrincipal);
         const amount: bigint = BigInt(ticketAmount * TICKET_PRICE * 100000000);
         const fee: bigint = BigInt(10000);
 
         // TODO: replace with a more reliable way to charge users
         return ledger?.transfer({
             memo: BigInt(0x1),
-            amount: { e8s: amount },
+            amount: { e8s: amount + fee },
             fee: { e8s: fee},
             to: depositAddressBlob as AccountIdentifier,
             from_subaccount: [],

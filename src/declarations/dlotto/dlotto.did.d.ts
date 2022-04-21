@@ -3,23 +3,24 @@ export type AccountIdentifier = Array<number>;
 export interface Bio { 'username' : string }
 export type Date = bigint;
 export interface Dlotto {
-  'assignTicketToUser' : (arg_0: Array<Ticket>) => Promise<Array<UserTicket>>,
+  'assignTicketToUser' : (arg_0: Array<Ticket>, arg_1: Principal) => Promise<
+      Array<UserTicket>
+    >,
   'canisterAccount' : () => Promise<AccountIdentifier>,
   'canisterBalance' : () => Promise<Tokens>,
-  'chargeICP' : (arg_0: Principal) => Promise<undefined>,
+  'chargeICP' : (arg_0: bigint, arg_1: Principal) => Promise<undefined>,
   'create' : () => Promise<Result>,
   'delete' : () => Promise<Result>,
   'getAllWinHistory' : () => Promise<Array<[bigint, Ticket]>>,
   'getCurrentRound' : () => Promise<Round>,
   'getCurrentWinTicket' : () => Promise<Ticket>,
-  'getDepositAddress' : () => Promise<AccountIdentifier>,
+  'getDepositAddress' : (arg_0: Principal) => Promise<AccountIdentifier>,
   'getTicketPrize' : (arg_0: bigint) => Promise<[] | [number]>,
   'getUserTicket' : (arg_0: bigint) => Promise<Result_3>,
   'getWinHistory' : (arg_0: bigint) => Promise<Result_2>,
   'read' : () => Promise<Result_1>,
   'update' : (arg_0: ProfileUpdate) => Promise<Result>,
   'userAccountIdPublic' : (arg_0: Principal) => Promise<AccountIdentifier>,
-  'userBalance' : () => Promise<Tokens>,
   'userId' : () => Promise<AccountIdentifier>,
 }
 export type Error = { 'NotFound' : null } |

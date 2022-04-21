@@ -36,13 +36,13 @@ export const idlFactory = ({ IDL }) => {
   const ProfileUpdate = IDL.Record({ 'bio' : Bio });
   const Dlotto = IDL.Service({
     'assignTicketToUser' : IDL.Func(
-        [IDL.Vec(Ticket)],
+        [IDL.Vec(Ticket), IDL.Principal],
         [IDL.Vec(UserTicket)],
         [],
       ),
     'canisterAccount' : IDL.Func([], [AccountIdentifier], []),
     'canisterBalance' : IDL.Func([], [Tokens], []),
-    'chargeICP' : IDL.Func([IDL.Principal], [], []),
+    'chargeICP' : IDL.Func([IDL.Nat64, IDL.Principal], [], []),
     'create' : IDL.Func([], [Result], []),
     'delete' : IDL.Func([], [Result], []),
     'getAllWinHistory' : IDL.Func(
@@ -52,14 +52,13 @@ export const idlFactory = ({ IDL }) => {
       ),
     'getCurrentRound' : IDL.Func([], [Round], []),
     'getCurrentWinTicket' : IDL.Func([], [Ticket], []),
-    'getDepositAddress' : IDL.Func([], [AccountIdentifier], []),
+    'getDepositAddress' : IDL.Func([IDL.Principal], [AccountIdentifier], []),
     'getTicketPrize' : IDL.Func([IDL.Nat], [IDL.Opt(IDL.Float64)], []),
     'getUserTicket' : IDL.Func([IDL.Nat], [Result_3], []),
     'getWinHistory' : IDL.Func([IDL.Nat], [Result_2], []),
     'read' : IDL.Func([], [Result_1], ['query']),
     'update' : IDL.Func([ProfileUpdate], [Result], []),
     'userAccountIdPublic' : IDL.Func([IDL.Principal], [AccountIdentifier], []),
-    'userBalance' : IDL.Func([], [Tokens], []),
     'userId' : IDL.Func([], [AccountIdentifier], []),
   });
   return Dlotto;

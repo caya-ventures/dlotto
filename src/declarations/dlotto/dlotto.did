@@ -56,10 +56,10 @@ type Error =
  };
 type Dlotto = 
  service {
-   assignTicketToUser: (vec Ticket) -> (vec UserTicket);
+   assignTicketToUser: (vec Ticket, principal) -> (vec UserTicket);
    canisterAccount: () -> (AccountIdentifier);
    canisterBalance: () -> (Tokens);
-   chargeICP: (principal) -> ();
+   chargeICP: (nat64, principal) -> ();
    create: () -> (Result);
    delete: () -> (Result);
    getAllWinHistory: () -> (vec record {
@@ -68,14 +68,13 @@ type Dlotto =
                                 });
    getCurrentRound: () -> (Round);
    getCurrentWinTicket: () -> (Ticket);
-   getDepositAddress: () -> (AccountIdentifier);
+   getDepositAddress: (principal) -> (AccountIdentifier);
    getTicketPrize: (nat) -> (opt float64);
    getUserTicket: (nat) -> (Result_3);
    getWinHistory: (nat) -> (Result_2);
    read: () -> (Result_1) query;
    update: (ProfileUpdate) -> (Result);
    userAccountIdPublic: (principal) -> (AccountIdentifier);
-   userBalance: () -> (Tokens);
    userId: () -> (AccountIdentifier);
  };
 type Date = int;

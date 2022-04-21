@@ -53,6 +53,8 @@ shared(init_msg) actor class Dlotto() = this {
     let buffTickets = Buffer.Buffer<Types.Ticket>(1);
     let buffUserTickets = Buffer.Buffer<Types.UserTicket>(1);
     let buffJackpotWinner = Buffer.Buffer<Nat>(1);
+    let fee: Nat64 = 10_000;
+    let ticketPrice: Nat64 = 10_000_000;
 
     system func heartbeat() : async () {
        await generateTicketDaily(12, 0);
@@ -138,11 +140,11 @@ shared(init_msg) actor class Dlotto() = this {
 
     // handle the process of assigning tickets to user when user buys tickets.
     // tickets should be assigned for the next round.
-    public shared(msg) func assignTicketToUser (ticketsToAssign : [Types.Ticket]) : async [Types.UserTicket] {
+    public shared(msg) func assignTicketToUser (ticketsToAssign : [Types.Ticket], userPrincipal: Principal) : async [Types.UserTicket] {
         var ticketNumber : Nat = 1;
         var userTickets = buffUserTickets.clone();
         let emptyUserTicket : Types.UserTicket = EmptyTicket.initEmptyUserTicket();
-        var chargeAmount: Nat64 = 0;
+        var chargeAmount: Nat64 = fee;
 
         var existingTickets : [Types.UserTicket] = switch (await getUserTicketByRound(msg.caller, round)) {
             case null [emptyUserTicket];
@@ -178,7 +180,23 @@ shared(init_msg) actor class Dlotto() = this {
             
             ticketNumber += 1;
             lastTicketCl += 1;
-            chargeAmount += 10_000_000;
+            chargeAmount += ticketPrice
+        };
+
+        let transferAccountBalance =  await Ledger.account_balance({ 
+            account = Account.accountIdentifier(Principal.fromActor(this), Account.principalSubaccount(userPrincipal)); 
+            });
+
+        if(Nat64.less(transferAccountBalance.e8s, chargeAmount)) {
+            let res = await Ledger.transfer({
+            memo: Nat64 = 0;
+            from_subaccount = ?Account.principalSubaccount(userPrincipal);
+            to = userAccountId(userPrincipal);
+            amount = { e8s = transferAccountBalance.e8s - fee };
+            fee = { e8s = fee };
+            created_at_time = ?{ timestamp_nanos = Nat64.fromNat(Int.abs(Time.now()))};
+            });
+            throw Error.reject("Something wrong with transaction, please try again later");
         };
 
         let userRoundKey = getUserRoundKey(msg.caller, round);
@@ -192,7 +210,7 @@ shared(init_msg) actor class Dlotto() = this {
         );
 
         userTicketStorage := newUserTicketStorage;
-        //chargeICP(10_000_000, msg.caller);
+        await chargeICP(chargeAmount, userPrincipal);
 
         return userTicketsArr;
     };
@@ -567,10 +585,6 @@ shared(init_msg) actor class Dlotto() = this {
         Account.accountIdentifier(principal, Account.defaultSubaccount())
     };
 
-    public shared(msg) func userBalance () : async Ledger.Tokens {
-        await Ledger.account_balance({ account = userAccountId(msg.caller) })
-    };
-
     public shared(msg) func userId () : async Account.AccountIdentifier {
         userAccountId(msg.caller);
     };
@@ -583,11 +597,33 @@ shared(init_msg) actor class Dlotto() = this {
         await Ledger.account_balance({ account = canisterAccountId() })
     };
 
-    public shared(msg) func getDepositAddress(): async Account.AccountIdentifier {
-        Account.accountIdentifier(Principal.fromActor(this), Account.principalSubaccount(msg.caller));
+    public shared(msg) func getDepositAddress(userPrincipal: Principal): async Account.AccountIdentifier {
+        Account.accountIdentifier(Principal.fromActor(this), Account.principalSubaccount(userPrincipal));
     };
 
-    public func chargeICP(toAccount : Principal): async () {
+    public func chargeICP(amount: Nat64, subaccount : Principal): async () {
+        let res = await Ledger.transfer({
+            memo: Nat64 = 0;
+            from_subaccount = ?Account.principalSubaccount(subaccount);
+            to = canisterAccountId();
+            amount = { e8s = amount - fee };
+            fee = { e8s = fee };
+            created_at_time = ?{ timestamp_nanos = Nat64.fromNat(Int.abs(Time.now()))};
+        });
+        switch (res) {
+            case (#Ok(blockIndex)) {
+            Debug.print("Funds transfered sucsesfully");
+            };
+            case (#Err(#InsufficientFunds { balance })) {
+            throw Error.reject("The balance is " # debug_show balance # " e8s");
+            };
+            case (#Err(other)) {
+            throw Error.reject("Unexpected error: " # debug_show other);
+            };
+        };
+    };
+
+     public func claimICP(toAccount : Principal): async () {
         let res = await Ledger.transfer({
             memo: Nat64 = 0;
             from_subaccount = null;
@@ -598,10 +634,10 @@ shared(init_msg) actor class Dlotto() = this {
         });
         switch (res) {
             case (#Ok(blockIndex)) {
-            Debug.print("Paid reward to Principal: " # debug_show toAccount # "and accountId" # debug_show userAccountId(toAccount));
+            Debug.print("Funds transfered sucsesfully");
             };
             case (#Err(#InsufficientFunds { balance })) {
-            throw Error.reject("Top me up! The balance is only " # debug_show balance # " e8s");
+            throw Error.reject("The balance is " # debug_show balance # " e8s");
             };
             case (#Err(other)) {
             throw Error.reject("Unexpected error: " # debug_show other);
