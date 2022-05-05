@@ -4,6 +4,7 @@ import { AppContext } from "../../context";
 import { dlotto } from '../../../../declarations/dlotto';
 import { AccountIdentifier } from '../../../../declarations/dlotto/dlotto.did';
 import { Principal } from '@dfinity/principal';
+import { ICP_TFU, TICKET_PRICE, TRANSACTION_FEE } from '../../config';
 
 const getWinHistory = async () => await dlotto.getWinHistory(BigInt(93));
 // const getUserTicket = async () => await dlotto.generateUserTicket(BigInt(1));
@@ -27,8 +28,8 @@ const Test = () => {
     console.log(receiveUserTicketHistory);
     
     let userId = useAsync(getUserId, []);
-    let amount: bigint = BigInt(555555);
-    let fee: bigint = BigInt(10000);
+    let amount: bigint = BigInt(TICKET_PRICE * ICP_TFU * 10);
+    let fee: bigint = BigInt(TRANSACTION_FEE * ICP_TFU);
     let getDepositAddress = async () => await dlotto.canisterAccount();
     
     let depositAddressBlob = useAsync(getDepositAddress, []).result as AccountIdentifier;

@@ -7,6 +7,7 @@ import { canisterId as ledgerCanisterId, createActor as createLedger } from '../
 import { _SERVICE as _LEDGER } from '../../../declarations/ledger/ledger.did';
 import { clear } from 'local-storage';
 import { Principal } from '@dfinity/principal';
+import { BALANCE_PRECISION, ICP_TFU } from '../config';
 
 type UseAuthClientProps = {};
 
@@ -71,7 +72,7 @@ export function useAuthClient(props?: UseAuthClientProps) {
             const principal = authClient?.getIdentity()?.getPrincipal() as Principal;
             const accountId = await dlotto.userAccountIdPublic(principal);
             const balance = await ledger?.account_balance({'account': accountId})
-            const balanceCalc = (Number( balance?.e8s)/100000000).toFixed(3);
+            const balanceCalc = (Number( balance?.e8s)/ICP_TFU).toFixed(BALANCE_PRECISION);
             setBalance(balanceCalc);
         }
         getBalance();

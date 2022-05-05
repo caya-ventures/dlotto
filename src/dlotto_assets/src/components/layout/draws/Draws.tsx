@@ -18,6 +18,7 @@ import { TicketGrid } from "../tickets";
 import { CSSTransition } from 'react-transition-group';
 import { Link } from 'react-router-dom';
 import { respondTo } from '../../../styles/helpers';
+import { Principal } from '@dfinity/principal';
 
 const DrawsStyled = styled.div`
   padding: 2rem 1rem;
@@ -104,7 +105,7 @@ const getAllWinHistory = async () => await dlotto.getAllWinHistory();
 
 const Draws = () => {
     const winHistory = useAsync(getAllWinHistory, []);
-    const { isAuthenticated, actor } = useContext(AppContext);
+    const { isAuthenticated, actor, authClient } = useContext(AppContext);
     const { userTicketsModal, setUserTicketsModal } = useContext(ModalContext);
 
     const [ isDetailsActive, setIsDetailsActive ] = useState(false);
@@ -113,6 +114,8 @@ const Draws = () => {
     const [ tickets, setTickets ]: [ Ticket[] | [], (a: Ticket[]) => void ] = useState([] as Ticket[]);
     const [ userTickets, setUserTickets ]: [ UserTicket[] | [], (a: UserTicket[]) => void ] = useState([] as UserTicket[]);
     const [ currentTicket, setCurrentTicket ]: [ Ticket | undefined, (a: Ticket) => void ] = useState();
+
+    const userPrincipal = authClient?.getIdentity().getPrincipal() as Principal;
 
     useEffect(() => {
         if (winHistory.result) {
@@ -160,9 +163,9 @@ const Draws = () => {
         setIsDetailsActive(!isDetailsActive);
     };
 
-    const onClaimAction = () => {
-        // TODO: add claim action
-        console.log('// TODO: add claim action');
+    const onClaimAction = async (ticketId: number) => {
+        const claimResult = await actor?.claimTicketPrize(BigInt(ticketId), userPrincipal);
+        // TODO: mark ticket as claimed
     };
 
     return (

@@ -63,7 +63,7 @@ shared(init_msg) actor class Dlotto() = this {
     };
 
     // generates winning ticket for currend draw
-    public func generateWinningTicket () : async Types.Ticket {
+    private func generateWinningTicket () : async Types.Ticket {
         let ticket : Types.Ticket = await generateTicket();
 
         updateTicketsHistory(round, ticket);
@@ -615,7 +615,7 @@ shared(init_msg) actor class Dlotto() = this {
         Account.accountIdentifier(Principal.fromActor(this), Account.principalSubaccount(userPrincipal));
     };
 
-    public func chargeICP(amount: Nat64, subaccount : Principal): async () {
+    private func chargeICP(amount: Nat64, subaccount : Principal): async () {
         let res = await Ledger.transfer({
             memo: Nat64 = 0;
             from_subaccount = ?Account.principalSubaccount(subaccount);
@@ -637,7 +637,7 @@ shared(init_msg) actor class Dlotto() = this {
         };
     };
 
-     public func claimICP(amount: Nat64, toAccount : Principal): async () {
+     private func claimICP(amount: Nat64, toAccount : Principal): async () {
         let res = await Ledger.transfer({
             memo: Nat64 = 0;
             from_subaccount = null;

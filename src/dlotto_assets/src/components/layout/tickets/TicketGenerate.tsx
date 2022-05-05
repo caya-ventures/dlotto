@@ -2,7 +2,7 @@ import React, { useContext, useState } from 'react';
 import styled from 'styled-components';
 import { baseTheme } from '../../../styles/theme';
 import { SvgArrowDown, SvgArrowTop } from '../../svg';
-import { TICKET_PRICE } from '../../../config';
+import { TICKET_PRICE, TRANSACTION_FEE } from '../../../config';
 import { roundPrice } from '../../../utils';
 import { AppContext } from '../../../context';
 
@@ -22,10 +22,20 @@ const Text = styled.span`
   font-size: .75rem;
 `;
 
-const TextPrice = styled.span`
+const TextPrice = styled.p`
   font-size: 1.25rem;
   font-weight: 700;
   user-select: none;
+  margin: 0;
+  text-align: right;
+`;
+
+const FeePrice = styled.p`
+  font-size: .75rem;
+  font-weight: 400;
+  user-select: none;
+  margin: 0;
+  text-align: right;
 `;
 
 const GenerateButton = styled.button`
@@ -111,7 +121,14 @@ const TicketGenerate = ({ action }: { action: (a: number) => void }) => {
                     </GenerateInput>
                     <GenerateButton onClick={() => action(count)}>Generate</GenerateButton>
                 </div>
-                <TextPrice>~{roundPrice(TICKET_PRICE * count)} ICP</TextPrice>
+                <div>
+                    <TextPrice>
+                        {roundPrice(TICKET_PRICE * count)} ICP
+                    </TextPrice>
+                    <FeePrice>
+                        +Fee {roundPrice(TRANSACTION_FEE * 2)} ICP
+                    </FeePrice>
+                </div>
             </WrapperLine>
         </Wrapper>
     );

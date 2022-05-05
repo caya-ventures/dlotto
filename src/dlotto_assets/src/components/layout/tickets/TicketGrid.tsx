@@ -72,7 +72,6 @@ const TicketGrid = ({ userTickets, hasEditAction, onEditAction, hasClaimAction, 
         if (currentTicket && userTickets) {
             const { ticketIds } = matchUserTickets(userTickets, currentTicket);
             setWinTickets(ticketIds);
-
         }
     }, [ userTickets, currentTicket ]);
 
@@ -101,7 +100,7 @@ const TicketGrid = ({ userTickets, hasEditAction, onEditAction, hasClaimAction, 
                     {
                         winTickets.includes(item.ticket_id) ?
                             <button className="btn btn-primary"
-                                    onClick={() => onClaimAction?.(Number(item.ticket_id) - 1)}>Claim</button> : <></>
+                                    onClick={() => onClaimAction?.(Number(item.ticket.entity_id))}>Claim</button> : <></>
                     }
                 </ClaimAction> : <></>
 

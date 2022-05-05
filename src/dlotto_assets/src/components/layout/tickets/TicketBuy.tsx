@@ -11,7 +11,7 @@ import TicketEdit from './TicketEdit';
 import { useHistory } from 'react-router-dom';
 import { SvgCross } from '../../svg';
 import toast from 'react-hot-toast';
-import { TICKET_PRICE } from '../../../config';
+import { ICP_TFU, TICKET_PRICE, TRANSACTION_FEE } from '../../../config';
 import { TransferError, TransferResult } from '../../../../../declarations/ledger/ledger.did';
 import { Principal } from '@dfinity/principal';
 
@@ -57,7 +57,7 @@ const TicketBuy = () => {
 
     const [ currentTicketId, setCurrentTicketId ] = useState(0 as number);
     const [ isApproving, setIsApproving ] = useState(false as boolean);
-    var userPrincipal = authClient?.getIdentity().getPrincipal() as Principal;
+    const userPrincipal = authClient?.getIdentity().getPrincipal() as Principal;
 
 
     const goBack = () => {
@@ -71,7 +71,8 @@ const TicketBuy = () => {
         const chargeResult = await chargeForTickets(tickets?.length || 0) as TransferResult;
 
         if ('Err' in chargeResult) {
-            toast.error(JSON.stringify(chargeResult.Err as TransferError));
+            toast.error('Payment error occurred!!!');
+            setIsApproving(false);
             return;
         }
 
@@ -86,10 +87,9 @@ const TicketBuy = () => {
 
     const chargeForTickets = async (ticketAmount: number): Promise<TransferResult> => {
         const depositAddressBlob = await actor?.getDepositAddress(userPrincipal);
-        const amount: bigint = BigInt(ticketAmount * TICKET_PRICE * 100000000);
-        const fee: bigint = BigInt(10000);
+        const amount: bigint = BigInt(ticketAmount * TICKET_PRICE * ICP_TFU);
+        const fee: bigint = BigInt(TRANSACTION_FEE * ICP_TFU);
 
-        // TODO: replace with a more reliable way to charge users
         return ledger?.transfer({
             memo: BigInt(0x1),
             amount: { e8s: amount + fee },

@@ -60,12 +60,9 @@ type Dlotto =
    assignTicketToUser: (vec Ticket, principal) -> (vec UserTicket);
    canisterAccount: () -> (AccountIdentifier);
    canisterBalance: () -> (Tokens);
-   chargeICP: (nat64, principal) -> ();
-   claimICP: (nat64, principal) -> ();
    claimTicketPrize: (nat, principal) -> (Error);
    create: () -> (Result);
    delete: () -> (Result);
-   generateWinningTicket: () -> (Ticket);
    getAllWinHistory: () -> (vec record {
                                   nat;
                                   Ticket;

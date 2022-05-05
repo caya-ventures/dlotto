@@ -43,12 +43,9 @@ export const idlFactory = ({ IDL }) => {
       ),
     'canisterAccount' : IDL.Func([], [AccountIdentifier], []),
     'canisterBalance' : IDL.Func([], [Tokens], []),
-    'chargeICP' : IDL.Func([IDL.Nat64, IDL.Principal], [], []),
-    'claimICP' : IDL.Func([IDL.Nat64, IDL.Principal], [], []),
     'claimTicketPrize' : IDL.Func([IDL.Nat, IDL.Principal], [Error], []),
     'create' : IDL.Func([], [Result], []),
     'delete' : IDL.Func([], [Result], []),
-    'generateWinningTicket' : IDL.Func([], [Ticket], []),
     'getAllWinHistory' : IDL.Func(
         [],
         [IDL.Vec(IDL.Tuple(IDL.Nat, Ticket))],

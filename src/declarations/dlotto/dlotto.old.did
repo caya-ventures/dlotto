@@ -53,6 +53,7 @@ type Error =
    AlreadyExists;
    NotAuthorized;
    NotFound;
+   Ok;
  };
 type Date = int;
 type Bio = record {username: text;};
@@ -62,7 +63,8 @@ service : {
   canisterAccount: () -> (AccountIdentifier);
   canisterBalance: () -> (Tokens);
   chargeICP: (nat64, principal) -> ();
-  claimICP: (principal) -> ();
+  claimICP: (nat64, principal) -> ();
+  claimTicketPrize: (nat, principal) -> (Error);
   create: () -> (Result);
   delete: () -> (Result);
   generateWinningTicket: () -> (Ticket);
@@ -73,7 +75,6 @@ service : {
   getCurrentRound: () -> (Round);
   getCurrentWinTicket: () -> (Ticket);
   getDepositAddress: (principal) -> (AccountIdentifier);
-  getTicketPrize: (nat) -> (opt float64);
   getUserTicket: (nat) -> (Result_3);
   getWinHistory: (nat) -> (Result_2);
   read: () -> (Result_1) query;
