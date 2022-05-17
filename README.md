@@ -9,7 +9,7 @@
 
 ```bash
 cd ~/projects/
-git clone git@gitlab.com:caya1/dlotto.git
+git clone git@github.com:caya-ventures/dlotto.git
 ```
     
 ## Install Internet Identity canister.
